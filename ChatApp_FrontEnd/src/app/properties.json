@@ -1,0 +1,33 @@
+{
+  "SpringServerUrl" : "",
+  "WebSocketApi" : "ws://",
+
+  "UserApi": {
+    "BaseUrl" : "/api/users",
+    "AllOtherUsers" : "/others",
+    "JoinedChatrooms": "/chatrooms/joined",
+    "OwnedChatrooms": "/chatrooms/owned"
+  },
+
+  "LoginApi": {
+    "BaseUrl" : "/api/login",
+    "LoginProcess" : "/login-process",
+    "Logout" : "/logout",
+    "LoggedUser" : "/check-login",
+    "DemandVerificationCode" : "/verification-code",
+    "LoginWithVerificationCode" : "/verification-code-process",
+    "SendResetPwdEmail": "/forget-password",
+    "ValidateToken": "/validate-token",
+    "ResetPassword": "/reset-password",
+    "CreateCompte": "/compte/create"
+  },
+
+  "ChatroomApi": {
+    "BaseUrl" : "/api/chatrooms",
+    "CreateChatroom": "/create",
+    "Members": "/members",
+    "UsersInvited": "/users/invited",
+    "UsersNotInvited": "/users/not-invited",
+    "HistoryMessages": "/history"
+  }
+}

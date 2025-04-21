@@ -1,0 +1,27 @@
+:host {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    width: 100%;
+}
+
+.row {
+    flex: 1;
+    padding : 1%;
+    padding-top: 3%;
+    display: flex;
+    flex-direction: row;
+}
+
+.mainPages {
+    flex: 1; 
+    background-color: white;
+    border: 2px solid #ccc;
+    padding: 10px;
+    margin-left: 1%;
+    box-shadow: 0 4px 6px #39373D;
+    min-height: 70vh;
+    max-height: 70vh;
+    overflow-y: auto;
+}

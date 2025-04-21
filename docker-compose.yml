@@ -1,0 +1,68 @@
+name: MyChatApp
+
+networks:
+  chatapp-network:
+    driver: bridge
+  middleware-network:
+    driver: bridge
+
+services:
+  frontend:
+    build: ./ChatApp_Frontend
+    container_name: chatapp-frontend
+    ports:
+      - "4200:80"
+    networks:
+      - chatapp-network
+  
+  postgres:
+    image: postgres:latest
+    container_name: chatapp-postgres
+    environment:
+      - POSTGRES_USER=chatapp-admin
+      - POSTGRES_PASSWORD=chatapp-admin-password
+      - POSTGRES_DB=chatAppDB
+    # ports:
+    #   - "5432:5432"
+    volumes:
+      - ./postgres-data:/var/lib/postgresql/data
+      - ./SQL-Scripts:/docker-entrypoint-initdb.d
+    networks:
+      - middleware-network
+    restart: unless-stopped
+
+  mongodb:
+    image: mongo:latest
+    container_name: chatapp-mongodb
+    volumes:
+      - ./mongodb-data:/data/db
+    networks:
+      - middleware-network
+
+  rabbitmq:
+    image: rabbitmq:latest
+    container_name: chatapp-rabbitmq
+    ports:
+      - "15672:15672"
+    environment:
+      - RABBITMQ_DEFAULT_USER=admin
+      - RABBITMQ_DEFAULT_PASS=ADMINadmin721215
+    networks:
+      - middleware-network
+
+  backend:
+    build: ./ChatApp_Backend
+    container_name: chatapp-backend
+    environment:
+      - DB_HOST=postgres
+      - DB_USERNAME=chatapp-admin
+      - DB_PASSWORD=chatapp-admin-password
+      - MONGO_HOST=mongodb
+      - RABBITMQ_HOST=rabbitmq
+      - RABBITMQ_USERNAME=admin
+      - RABBITMQ_PASSWORD=ADMINadmin721215
+      - FRONT_URL=http://localhost:4200
+    networks:
+      - chatapp-network
+      - middleware-network
+    

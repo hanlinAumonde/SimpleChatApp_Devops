@@ -1,0 +1,15 @@
+:host {
+    padding-top: 10%;
+    flex: 1;
+}
+
+.container {
+    overflow-y: auto;
+}
+
+.logo {
+    width: 100px;
+    height: 100px;
+    margin: 0 auto;
+    display: block;
+}

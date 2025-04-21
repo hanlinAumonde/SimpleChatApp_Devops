@@ -1,0 +1,51 @@
+<div class="accordion" id="accordionPanelStayOpen">
+    <div class="accordion-item">
+        <h2 class="accordion-header">
+            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapseOne" aria-expanded="true" aria-controls="panelsStayOpen-collapseOne">
+                User - Info
+            </button>
+        </h2>
+        <div id="panelsStayOpen-collapseOne" class="accordion-collapse collapse show">
+            <div class="accordion-body">
+                @if(userInfo$ | async; as userInfo){
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item">
+                            Email Address : <strong>{{userInfo.mail}}</strong>
+                        </li>
+                        <li class="list-group-item">
+                            First Name : <strong>{{userInfo.firstName}}</strong>
+                        </li>
+                        <li class="list-group-item">
+                            Last Name : <strong>{{userInfo.lastName}}</strong>
+                        </li>
+                    </ul>
+                }
+                <button type="button" class="btn btn-outline-danger" (click)="onClickLogout()">Deconnexion</button>
+            </div>
+        </div>
+    </div>
+    <div class="accordion-item">
+        <h2 class="accordion-header">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapseTwo" aria-expanded="true" aria-controls="panelsStayOpen-collapseTwo">
+                Menu
+            </button>
+        </h2>
+        <div id="panelsStayOpen-collapseTwo" class="accordion-collapse collapse">
+            <div class="accordion-body">
+                <ul class="list-group list-group-flush nav">
+                    @for(routerLink of routerLinkList; track routerLink.id){
+                        @if(routerLink.id <= 3){
+                        <li class="list-group-item nav-item">
+                            <a class="nav-link fs-5" [routerLink]="routerLink.path">
+                                <strong>{{routerLink.titre}}</strong>
+                            </a>
+                        </li>
+                        }
+                    }
+                </ul>
+            </div>
+        </div>
+    </div>
+        
+</div>
+

@@ -1,0 +1,24 @@
+.appContainer {
+    display: flex;
+    flex-direction: column;
+    min-height: 100%;
+    width:98%;
+    padding: 0;
+    margin-left: 0;
+    margin-right: 0;
+}
+
+.header {
+    /* height:90px; */
+    height: 8vh;
+}
+
+.container-fluid {
+    padding: 2%;
+}
+
+
+.footer {
+    /* height:80px; */
+    height: 8vh;
+}

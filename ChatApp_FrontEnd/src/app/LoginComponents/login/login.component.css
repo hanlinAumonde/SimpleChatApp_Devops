@@ -1,0 +1,29 @@
+.logo {
+    width: 100px;
+    height: 100px;
+    margin: 0 auto;
+    display: block;
+}
+
+.mb-2 {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.input-row {
+  display: flex;
+}
+
+.input-row input {
+  flex: 5;
+}
+
+.input-row button {
+  padding: 8px 16px;
+  background-color: #18a5d0;
+  color: white;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+}

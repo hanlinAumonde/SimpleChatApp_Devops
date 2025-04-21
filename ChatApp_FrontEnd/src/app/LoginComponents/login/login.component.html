@@ -1,0 +1,78 @@
+ <div class="container">
+    <img src="chat.png" alt="logo" class="logo">
+    <br/>
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" #formDir="ngForm">
+        <div [hidden]="formDir.submitted">
+            <div class="mb-3">
+                <label for="username" class="form-label str"><strong>Email :</strong></label>
+                <input class="form-control" type="text" id="username" name="username" formControlName="username"
+                    placeholder="Entrer votre email" autocomplete="username">
+                @if(username.invalid && (username.dirty || username.touched)){
+                    <div class="text text-danger">
+                        @if(username.hasError('required')){
+                            Email est requis
+                        }
+                    </div>
+                }
+            </div>
+            <div class="mb-3">
+                  <label for="password" class="form-label">
+                    <strong>{{loginWithCode? "Code de vérification :" : "Mot de passe :"}}</strong>
+                    <br/>
+                    <a class="link" (click)="changeLoginType()">
+                      Se connecter avec {{loginWithCode? "mot de passe": "code de vérification" }}
+                    </a>
+                  </label>
+                  <div class="input-row">
+                    @if(loginWithCode){
+                      <input class="form-control" type="text" id="password" formControlName="password"
+                           placeholder="Entrer votre mot de passe" autocomplete="off">
+                      <button type="button" class="btn"
+                              (click)="onSendCode()" [disabled]="restTime > 0">
+                        {{ restTime == 0?  "Envoyer le code" : "Réessayer" +(restTime > 0? " (" + restTime + "s)":"") }}
+                      </button>
+                    }@else{
+                      <input class="form-control" type="password" id="password" name="password" formControlName="password"
+                           placeholder="Entrer votre mot de passe" autocomplete="current-password">
+                    }
+                  </div>
+                  @if(password.invalid && (password.dirty || password.touched)){
+                    <div class="text text-danger">
+                      @if(password.hasError('required')){
+                        {{loginWithCode? "Code de vérification" : "Mot de passe"}} est requis
+                      }
+                    </div>
+                  }
+            </div>
+            <div class="form-check">
+                <input type="checkbox" id="remember-me" formControlName="rememberMe" class="form-check-input">
+                <label class="form-check-label" for="remember-me">
+                  Remember me
+                </label>
+            </div>
+            @if(!loginWithCode){
+              <div class="mb-2">
+                <a class="link" [routerLink]="routerLinkList[7].path">Mot de passe oublié ?</a>
+              </div>
+            }
+            <div class="mb-2">
+                <a class="link" [routerLink]="routerLinkList[9].path">Pas encore un compte? Créer un compte</a>
+            </div>
+            <button type="submit" class="btn btn-primary" style="width: 100%;" [disabled]="loginForm.invalid">Se connecter</button>
+        </div>
+    </form>
+    @if(formDir.submitted){
+        @if(afterGettedUserInfo$ | async; as loggedMsg){
+            @if(loggedMsg){
+                <div class="alert alert-danger">
+                    {{loggedMsg}}
+                </div>
+                <button class="btn btn-primary" (click)="resetLoginForm()">Reessayer</button>
+            }
+        }@else {
+            <div class="spinner-border text-secondary" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        }
+    }
+</div>

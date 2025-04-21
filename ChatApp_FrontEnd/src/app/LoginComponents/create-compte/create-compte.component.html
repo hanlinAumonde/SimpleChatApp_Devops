@@ -1,0 +1,126 @@
+<div class="contanier">
+    <img src="chat.png" alt="logo" class="logo">
+    <br/>
+    <h3>Creation du votre compte: </h3>
+    <form [formGroup]="createCompteForm" (ngSubmit)="onSubmit()" #formDir="ngForm">
+        <div [hidden]="formDir.submitted">
+            <div class="mb-3">
+                <label for="firstName" class="form-label">Prenom :</label>
+                <input class="form-control" type="text" id="firstName" formControlName="firstName"
+                    placeholder="Entrer votre prenom">
+                @if(firstName?.invalid && (firstName?.dirty || firstName?.touched)){
+                    <div class="text text-danger">
+                        @if(firstName?.hasError('required')){
+                            Prenom est requis
+                        }
+                        @if(firstName?.hasError('minlength')){
+                            Prenom doit contenir au moins 2 caracteres
+                        }
+                        @if(firstName?.hasError('maxlength')){
+                            Prenom doit contenir au plus 50 caracteres
+                        }
+                        @if(firstName?.hasError('invalidName')){
+                            Prenom format invalide
+                        }
+                    </div>
+                }
+            </div>
+            <div class="mb-3">
+                <label for="lastName" class="form-label">Nom :</label>
+                <input class="form-control" type="text" id="lastName" formControlName="lastName"
+                    placeholder="Entrer votre nom">
+                @if(lastName?.invalid && (lastName?.dirty || lastName?.touched)){
+                    <div class="text text-danger">
+                        @if(lastName?.hasError('required')){
+                            Nom est requis
+                        }
+                        @if(lastName?.hasError('minlength')){
+                            Nom doit contenir au moins 2 caracteres
+                        }
+                        @if(lastName?.hasError('maxlength')){
+                            Nom doit contenir au plus 50 caracteres
+                        }
+                        @if(lastName?.hasError('invalidName')){
+                            Nom format invalide
+                        }
+                    </div>
+                }
+            </div>
+            <div class="mb-3">
+                <label for="mail" class="form-label">Email :</label>
+                <input class="form-control" type="text" id="mail" formControlName="mail"
+                    placeholder="Entrer votre email">
+                @if(mail?.invalid && (mail?.dirty || mail?.touched)){
+                    <div class="text text-danger">
+                        @if(mail?.hasError('required')){
+                            Email est requis
+                        }
+                        @if(mail?.hasError('invalidEmail')){
+                            Email format invalide
+                        }
+                    </div>
+                }
+            </div>
+            <div class="mb-3">
+                <label for="password" class="form-label">Mot de passe :</label>
+                <input class="form-control" type="password" id="password" name="password" formControlName="password"
+                    placeholder="Entrer votre mot de passe" autocomplete="new-password">
+                @if(password?.invalid && (password?.dirty || password?.touched)){
+                    <div class="text text-danger">
+                        @if(password?.hasError('required')){
+                            Mot de passe est requis
+                        }
+                        @if(password?.hasError('invalidPassword')){
+                            Mot de passe format invalide ou length invalid (8 - 15 characters)
+                        }
+                    </div>
+                }
+            </div>
+            <div class="mb-3">
+                <label for="confirmPassword" class="form-label">Confirmer mot de passe :</label>
+                <input class="form-control" type="password" id="confirmPassword" formControlName="confirmPassword"
+                    placeholder="Confirmer votre mot de passe">
+                @if(confirmPassword?.invalid && (confirmPassword?.dirty || confirmPassword?.touched)){
+                    <div class="text text-danger">
+                        @if(confirmPassword?.hasError('required')){
+                            Confirmer mot de passe est requis
+                        }
+                        @if(confirmPassword?.hasError('inConfirmedPassword')){
+                            Mot de passe et Confirmer mot de passe ne sont pas identiques
+                        }
+                    </div>
+                }
+            </div>
+            <button type="submit" class="btn btn-primary" [disabled]="createCompteForm.invalid">Créer un compte</button>
+        </div>
+    </form>
+    @if(formDir.submitted){
+        @if(afterCreateCompte$ | async; as result){
+            @if(result.createMsg === 'create compte'){
+                @if(login$ | async; as loggedMsg){
+                    @if(loggedMsg){
+                        <div class="alert alert-danger">
+                            {{loggedMsg}}
+                        </div>
+                        <button class="btn btn-primary" (click)="returnToLogin()">Reessayer</button>
+                    }
+                }@else{
+                    <div class="alert alert-success">
+                        <p>Compte créé avec succès</p>
+                        <p>Login in process...</p>
+                        <div class="spinner-border text-secondary" role="status">
+                            <span class="visually-hidden"></span>
+                        </div>
+                    </div>
+                }
+                
+
+            }@else {
+                <div class="alert alert-danger">
+                    <p>Erreur lors de la création du compte</p>
+                    <button class="btn btn-primary" (click)="resetCreateCompteForm()">Reessayer</button>
+                </div>
+            }
+        }
+    }
+</div>
