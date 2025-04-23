@@ -10,12 +10,7 @@ public final class ConstantValues {
 	// Msg for creation of user compte
 	public static final String CreationSuccess = "create compte";
 	public static final String CompteExist = "compte already exists";
-	
-	// Default page size for pagination
-	public static final int DefaultPageSize_Users = 5;
-	public static final int	DefaultPageSize_Chatrooms = 5;
-	public static final int	DefaultPageSize_Messages = 10;
-	
+
     // Date format for chatroom start date
 	public static final DateTimeFormatter ISO_LOCAL_DATETIME_MINUTES = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
 
@@ -61,4 +56,9 @@ public final class ConstantValues {
 
     // JWT token - cookie name
     public static final String JWT_TOKEN_COOKIE_NAME = "JWT-Token";
+
+    // Redis keys for verification code and attempts
+    public static final String CODE_PREFIX = "verification:code:";
+    public static final String ATTEMPTS_PREFIX = "verification:attempts:";
+    public static final String BLACKLIST_PREFIX = "token:blacklist:";
 }

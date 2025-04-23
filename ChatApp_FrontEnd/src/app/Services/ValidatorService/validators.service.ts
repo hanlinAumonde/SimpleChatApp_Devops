@@ -16,9 +16,17 @@ export class ValidatorsService {
     };
   }
 
-  First_LastNameValidator() {
+  LastNameValidator() {
     return (control: AbstractControl): ValidationErrors | null => {
-      const regex = /^[A-Z]*(-[A-Z]*)?$/;
+      const regex = /^([A-ZÀÂÄÇÉÈÊËÎÏÔÖÙÛÜŸ]+)([- ][A-ZÀÂÄÇÉÈÊËÎÏÔÖÙÛÜŸ]+)*$/;
+      const invalid = !regex.test(control.value);
+      return invalid ? { invalidName: true } : null;
+    };
+  }
+
+  FirstNameValidator() {
+    return (control: AbstractControl): ValidationErrors | null => {
+      const regex = /^([A-ZÀÂÄÇÉÈÊËÎÏÔÖÙÛÜŸ][a-zàâäçéèêëîïôöùûüÿ]+|[A-ZÀÂÄÇÉÈÊËÎÏÔÖÙÛÜŸ]+)([- ]([A-ZÀÂÄÇÉÈÊËÎÏÔÖÙÛÜŸ][a-zàâäçéèêëîïôöùûüÿ]+|[A-ZÀÂÄÇÉÈÊËÎÏÔÖÙÛÜŸ]+))*$/;
       const invalid = !regex.test(control.value);
       return invalid ? { invalidName: true } : null;
     };

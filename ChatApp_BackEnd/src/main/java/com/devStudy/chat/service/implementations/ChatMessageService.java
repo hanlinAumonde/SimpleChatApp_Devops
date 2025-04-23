@@ -2,7 +2,6 @@ package com.devStudy.chat.service.implementations;
 
 import static com.devStudy.chat.service.utils.ConstantValues.ContentTimeStampFormat;
 import static com.devStudy.chat.service.utils.ConstantValues.DateSignFormat;
-import static com.devStudy.chat.service.utils.ConstantValues.DefaultPageSize_Messages;
 import static com.devStudy.chat.service.utils.ConstantValues.MSG_CONTENT;
 import static com.devStudy.chat.service.utils.ConstantValues.MSG_DATE_SIGN;
 import static com.devStudy.chat.service.utils.ConstantValues.MSG_LATEST_DATE_SIGN;
@@ -13,6 +12,7 @@ import java.util.List;
 import org.apache.commons.lang3.time.DateUtils;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -30,6 +30,9 @@ import com.devStudy.chat.service.interfaces.ChatMessageServiceInt;
 public class ChatMessageService implements ChatMessageServiceInt {
 
 	private final ChatMessageRepository chatMessageRepository;
+
+	@Value("${chatroomApp.pageable.DefaultPageSize_Messages}")
+	private int DefaultPageSize_Messages;
 
 	@Autowired
 	public ChatMessageService(ChatMessageRepository chatMessageRepository) {

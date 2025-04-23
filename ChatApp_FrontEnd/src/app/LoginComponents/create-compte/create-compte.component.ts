@@ -22,14 +22,14 @@ export class CreateCompteComponent {
   afterCreateCompte$!: Observable<CreateCompteModel>;
   login$!: Observable<string>;
 
-  constructor(private formBuilder: FormBuilder, 
+  constructor(private formBuilder: FormBuilder,
               private router: Router,
               private checkLoginService: CheckLoginService,
               private sharedUserInfoService: SharedUserInfoService,
               private validatorsService: ValidatorsService) {
     this.createCompteForm = this.formBuilder.group({
-      firstName: ['', [Validators.required,Validators.minLength(2),Validators.maxLength(50),this.validatorsService.First_LastNameValidator()]],
-      lastName: ['', [Validators.required,Validators.minLength(2),Validators.maxLength(50),this.validatorsService.First_LastNameValidator()]],
+      firstName: ['', [Validators.required,Validators.minLength(2),Validators.maxLength(50),this.validatorsService.FirstNameValidator()]],
+      lastName: ['', [Validators.required,Validators.minLength(2),Validators.maxLength(50),this.validatorsService.LastNameValidator()]],
       mail: ['', [Validators.required, this.validatorsService.emailValidator()]],
       password: ['', [Validators.required, this.validatorsService.passwordFormatValidator()]],
       confirmPassword: ['', [Validators.required, this.validatorsService.confirmPasswordValidator('password')]]

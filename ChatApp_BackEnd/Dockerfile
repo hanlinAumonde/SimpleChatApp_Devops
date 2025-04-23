@@ -27,5 +27,6 @@ WORKDIR /chatApp
 ENV TZ=Europe/Paris
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 COPY --from=build /app/target/*.jar chatApp.jar
+COPY wait-for-it.sh wait-for-it.sh
 EXPOSE 53050
-ENTRYPOINT ["java", "-jar", "chatApp.jar"]
+# ENTRYPOINT ["java", "-jar", "chatApp.jar"]

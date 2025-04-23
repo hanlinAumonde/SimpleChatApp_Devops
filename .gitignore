@@ -1,3 +1,4 @@
 mongodb-data/
 postgres-data/
+redis-data/
 .idea

@@ -3,6 +3,7 @@ package com.devStudy.chat.service.implementations;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -26,8 +27,6 @@ import com.devStudy.chat.service.interfaces.ChatroomServiceInt;
 import com.devStudy.chat.service.utils.Events.ChangeChatroomMemberEvent;
 import com.devStudy.chat.service.utils.Events.RemoveChatroomEvent;
 
-import static com.devStudy.chat.service.utils.ConstantValues.DefaultPageSize_Chatrooms;
-
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -38,6 +37,9 @@ import java.util.Optional;
 public class ChatroomService implements ChatroomServiceInt {
 
     private final Logger logger = LoggerFactory.getLogger(ChatroomService.class);
+
+    @Value("${chatroomApp.pageable.DefaultPageSize_Chatrooms}")
+    private int DefaultPageSize_Chatrooms;
 
     private final UserRepository userRepository;
     private final ChatroomRepository chatroomRepository;

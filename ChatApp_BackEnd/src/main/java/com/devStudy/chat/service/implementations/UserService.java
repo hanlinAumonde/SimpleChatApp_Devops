@@ -3,19 +3,12 @@ package com.devStudy.chat.service.implementations;
 import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.amqp.core.Message;
-import org.springframework.amqp.rabbit.annotation.RabbitListener;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.mail.MailException;
-import org.springframework.security.authentication.AnonymousAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -30,30 +23,32 @@ import com.devStudy.chat.dto.UserDTO;
 import com.devStudy.chat.model.User;
 import com.devStudy.chat.service.interfaces.UserServiceInt;
 
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Objects;
+import java.util.Optional;
 
-import java.nio.charset.StandardCharsets;
-import java.util.*;
+import static com.devStudy.chat.service.utils.ConstantValues.CompteExist;
+import static com.devStudy.chat.service.utils.ConstantValues.CreationSuccess;
 
-import static com.devStudy.chat.service.utils.ConstantValues.*;
 
 @Service
 public class UserService implements UserServiceInt, UserDetailsService {
 	
 	private static final Logger LOGGER = LoggerFactory.getLogger(UserService.class);
 
+    @Value("${chatroomApp.pageable.DefaultPageSize_Users}")
+    private int DefaultPageSize_Users;
+
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
-    private final EmailService emailService;
     private final JwtTokenService tokenService;
-    private final RabbitTemplate rabbitTemplate;
 
     @Autowired
-    public UserService(PasswordEncoder passwordEncoder, UserRepository userRepository, EmailService emailService, JwtTokenService tokenService, RabbitTemplate rabbitTemplate) {
+    public UserService(PasswordEncoder passwordEncoder, UserRepository userRepository, JwtTokenService tokenService) {
         this.passwordEncoder = passwordEncoder;
         this.userRepository = userRepository;
-        this.emailService = emailService;
         this.tokenService = tokenService;
-        this.rabbitTemplate = rabbitTemplate;
     }
     
     private Pageable getPageableSetting(int page) {

@@ -19,6 +19,9 @@ spring:
       port: ${MONGO_PORT:27017}
       database: ${MONGO_DBNAME:ChatApp}
       auto-index-creation: true
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
   
   # MVC 配置
   mvc:
@@ -52,6 +55,12 @@ chatroomApp:
   CHAT_ENDPOINT: ${CHAT_ENDPOINT:/ws/chatroom/{chatroomId}/user/{userId}}
   VERIFICATION_CODE_LOGIN_ENDPOINT: ${VERIFICATION_CODE_LOGIN_ENDPOINT:/api/login/verification-code-process}
   MAX_FAILED_ATTEMPTS: 5
+  pageable:
+    DefaultPageSize_Users: 5
+    DefaultPageSize_Chatrooms: 5
+    DefaultPageSize_Messages: 10
+  redis:
+    expirationTime: 300
   jwt:
     secret: dGhpcyBpcyBhIHRlc3Qgc2VjcmV0IGtleSBmb3IgZ2VuZXJhdGUgand0IHRva2Vucw==
     resetPwdTokenExpirationTime: 30
@@ -59,8 +68,6 @@ chatroomApp:
   rememberMe:
     key: remerber-me
     expirationTime: 604800
-  blackListService:
-    clearExpiredTokensInterval: 900000
 
 server:
   port: 53050

@@ -73,7 +73,7 @@ public class RabbitMQUtil {
     /**
      * Cette méthode permet d'envoyer un mail de réinitialisation de mot de passe
      */
-    @RabbitListener(queues = RABBITMQ_QUEUE_Q1)
+    @RabbitListener(queues = RABBITMQ_QUEUE_Q1, concurrency = "1-3")
     public void sendResetPasswordEmail(String email) {
         try {
             if(userService.findUserOrAdmin(email, false).isPresent()) {
@@ -100,7 +100,7 @@ public class RabbitMQUtil {
         }
     }
 
-    @RabbitListener(queues = RABBITMQ_QUEUE_Q2)
+    @RabbitListener(queues = RABBITMQ_QUEUE_Q2, concurrency = "1-5")
     public void sendVerificationCodeEmail(String email) {
         verificationCodeService.sendCode(email);
     }
