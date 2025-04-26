@@ -1,0 +1,79 @@
+# should be in the .github/workflows directory
+
+# This workflow builds and deploys the ChatApp application to an EC2 instance.
+# It uses Docker to build the frontend and backend images, pushes them to Docker Hub,
+# and then deploys them to the EC2 instance using SSH.
+
+name: Build, Push and Deploy
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Check changed files
+        id: filter
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            frontend:
+              - 'Chatroom_FrontEnd/**'
+            backend:
+              - 'ChatApp_BackEnd/**'
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      # 构建并推送API网关镜像
+      - name: Build and push API Gateway
+        if: steps.filter.outputs.frontend == 'true'
+        uses: docker/build-push-action@v5
+        with:
+          context: ./Chatroom_FrontEnd
+          push: true
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/chatapp-frontend:latest
+
+      # 构建并推送后端镜像
+      - name: Build and push Backend
+        if: steps.filter.outputs.backend == 'true'
+        uses: docker/build-push-action@v5
+        with:
+          context: ./ChatApp_BackEnd
+          push: true
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/chatapp-backend:latest
+
+      # 使用SSH连接到EC2实例
+      - name: Setup SSH
+        uses: webfactory/ssh-agent@v0.9.1
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Add host to known_hosts
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -H ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Copy deploy script to EC2
+        run: |
+          chmod +x ./ChatApp_BackEnd/deploy.sh
+          scp -P ${{ secrets.EC2_PORT }} ./ChatApp_BackEnd/deploy.sh ${{ secrets.EC2_USERNAME }}@${{ secrets.EC2_HOST }}:~/chatapp/
+
+      # 在EC2上执行部署
+      - name: Deploy to EC2
+        run: |
+          ssh -p ${{ secrets.EC2_PORT }} ${{ secrets.EC2_USERNAME }}@${{ secrets.EC2_HOST }} '
+            chmod +x ~/chatapp/deploy.sh
+            ~/chatapp/deploy.sh
+          '
