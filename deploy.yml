@@ -68,6 +68,7 @@ jobs:
       - name: Copy deploy script to EC2
         run: |
           chmod +x ./ChatApp_BackEnd/deploy.sh
+          scp -P ${{ secrets.EC2_PORT }} ./ApiGateWay/nginx.conf ${{ secrets.EC2_USERNAME }}@${{ secrets.EC2_HOST }}:~/chatapp/nginx-conf/
           scp -P ${{ secrets.EC2_PORT }} ./ChatApp_BackEnd/deploy.sh ${{ secrets.EC2_USERNAME }}@${{ secrets.EC2_HOST }}:~/chatapp/
 
       # 在EC2上执行部署

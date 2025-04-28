@@ -11,9 +11,20 @@ services:
     build: ./ChatApp_Frontend
     container_name: chatapp-frontend
     ports:
-      - "4200:80"
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /path/to/cert-file:/etc/nginx/certs/cert-file
+      - /path/to/cert-key:/etc/nginx/certs/cert-key
+      - ./nginx-conf/nginx.conf:/etc/nginx/conf.d/default.conf
     networks:
       - chatapp-network
+    restart: always
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:80"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
   
   postgres:
     image: postgres:latest
@@ -32,11 +43,12 @@ services:
   mongodb:
     image: mongo:latest
     container_name: chatapp-mongodb
+    command: ["--wiredTigerCacheSizeGB", "0.26"]
     volumes:
       - ./mongodb-data:/data/db
     networks:
       - middleware-network
-    restart: unless-stopped
+    restart: always
 
   rabbitmq:
     image: rabbitmq:latest
@@ -48,14 +60,14 @@ services:
       - RABBITMQ_DEFAULT_PASS=admin # your rabbitmq password
     networks:
       - middleware-network
-    restart: unless-stopped
+    restart: always
 
   redis:
     image: redis:latest
     container_name: chatapp-redis
     networks:
       - middleware-network
-    restart: unless-stopped
+    restart: always
 
   backend:
     build: ./ChatApp_Backend
@@ -98,8 +110,8 @@ services:
       - RABBITMQ_HOST=rabbitmq
       - RABBITMQ_USERNAME=admin
       - RABBITMQ_PASSWORD=admin
-      - FRONT_URL=http://localhost:4200
+      - FRONT_URL=url_of_front_end
     networks:
       - chatapp-network
       - middleware-network
-    
+    restart:always
