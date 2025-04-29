@@ -1,9 +1,11 @@
 package com.devStudy.chat.dto;
 
+import java.io.Serializable;
+
 /**
  * Cette classe permet de représenter un utilisateur avec moins d'informations que la classe User(pas de mdp)
  */
-public class UserDTO {
+public class UserDTO implements Serializable {
     public long id;
     public String lastName;
     public String firstName;

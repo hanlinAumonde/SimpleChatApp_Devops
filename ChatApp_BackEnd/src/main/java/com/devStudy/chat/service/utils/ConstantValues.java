@@ -54,6 +54,9 @@ public final class ConstantValues {
     public static final String ROUTING_KEY_RET_PASSWORD = "mail.resetPassword";
     public static final String ROUTING_KEY_VERIFICATION_CODE = "mail.verificationCode";
 
+    public static final String CHATROOM_CHANNEL = "channel:chatroom:%d";
+    public static final String CHATROOM_USERS_KEY = "chatroom:%d:user:";
+
     // JWT token - cookie name
     public static final String JWT_TOKEN_COOKIE_NAME = "JWT-Token";
 

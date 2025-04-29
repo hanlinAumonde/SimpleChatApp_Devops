@@ -138,9 +138,9 @@ public class WebSecurityConfig {
                                     VerificationCodeAuthenticationFilter verificationCodeAuthenticationFilter,
                                     JwtTokenService jwtTokenService) throws Exception {
         return http
-                .cors(cors ->
-        			cors.configurationSource(corsConfigurationSource())
-        		)
+//                .cors(cors ->
+//        			cors.configurationSource(corsConfigurationSource())
+//        		)
           
                 //.csrf(AbstractHttpConfigurer::disable)
                 .csrf(csrf -> csrf

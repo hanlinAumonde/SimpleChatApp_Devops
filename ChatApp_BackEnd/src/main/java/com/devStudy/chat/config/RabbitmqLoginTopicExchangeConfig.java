@@ -14,12 +14,13 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-public class RabbitmqTopicExchangeConfig {
+public class RabbitmqLoginTopicExchangeConfig {
     @Bean Queue queue() { return new Queue(RABBITMQ_QUEUE_Q1); }
 
     @Bean Queue queue2() { return new Queue(RABBITMQ_QUEUE_Q2); }
 
-    @Bean TopicExchange exchange() { return new TopicExchange(RABBITMQ_EXCHANGE_NAME); }
+    @Bean(name = RABBITMQ_EXCHANGE_NAME)
+    TopicExchange exchange() { return new TopicExchange(RABBITMQ_EXCHANGE_NAME); }
 
     @Bean
     Binding queueBinding(){

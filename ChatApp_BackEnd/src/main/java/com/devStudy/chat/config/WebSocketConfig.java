@@ -1,5 +1,6 @@
 package com.devStudy.chat.config;
 
+import com.devStudy.chat.websocket.distributed.DistributedChatWebSocketHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,10 +21,11 @@ public class WebSocketConfig implements WebSocketConfigurer {
 	@Value("${chatroomApp.CHAT_ENDPOINT}")
 	private String CHAT_ENDPOINT;
 		
-	private final ChatWebSocketHandler chatWebSocketHandler;
+	//private final ChatWebSocketHandler chatWebSocketHandler;
+	private final DistributedChatWebSocketHandler chatWebSocketHandler;
 
 	@Autowired
-	public WebSocketConfig(ChatWebSocketHandler chatWebSocketHandler) {
+	public WebSocketConfig(DistributedChatWebSocketHandler chatWebSocketHandler) {
 		this.chatWebSocketHandler = chatWebSocketHandler;
 	}
 

@@ -55,6 +55,7 @@ chatroomApp:
   CHAT_ENDPOINT: ${CHAT_ENDPOINT:/ws/chatroom/{chatroomId}/user/{userId}}
   VERIFICATION_CODE_LOGIN_ENDPOINT: ${VERIFICATION_CODE_LOGIN_ENDPOINT:/api/login/verification-code-process}
   MAX_FAILED_ATTEMPTS: 5
+  CHAT_SESSION_EXPIRY: 86400
   pageable:
     DefaultPageSize_Users: 5
     DefaultPageSize_Chatrooms: 5

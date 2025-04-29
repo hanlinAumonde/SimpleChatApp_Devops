@@ -52,7 +52,7 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
 	private final UserService userService;
 	private final ChatMessageService chatMessageService;
 
-	@Autowired
+	//@Autowired
 	public ChatWebSocketHandler(UserService userService, ChatMessageService chatMessageService) {
 		this.userService = userService;
 		this.chatMessageService = chatMessageService;
@@ -195,8 +195,8 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
 	@Override
 	public void afterConnectionClosed(WebSocketSession session, CloseStatus status) {
 		long chatroomId = (long) session.getAttributes().get("chatroomId");
-        long userId = (long) session.getAttributes().get("userId");
-		UserDTO userInfo = getUserInfo(userId);
+		//UserDTO userInfo = getUserInfo(userId);
+		UserDTO userInfo = CHATROOMS_MAP.get(chatroomId).get(session);
 
 		// on envoie un message de déconnexion à tous les utilisateurs connect
 		broadcastMessage(
@@ -213,7 +213,8 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
 	public void handleTextMessage(WebSocketSession session, TextMessage message) {
 		long chatroomId = (long) session.getAttributes().get("chatroomId");
 		long userId = (long) session.getAttributes().get("userId");
-		UserDTO userInfo = getUserInfo(userId);
+		//UserDTO userInfo = getUserInfo(userId);
+		UserDTO userInfo = CHATROOMS_MAP.get(chatroomId).get(session);
 		
 		String msg = message.getPayload();
 
