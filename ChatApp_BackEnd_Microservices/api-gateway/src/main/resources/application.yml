@@ -19,8 +19,6 @@ spring:
           uri: lb://auth-service
           predicates:
             - Path=/api/auth/**
-          filters:
-            - StripPrefix=2  # 去掉 /api/auth 前缀
         
         # 用户服务路由
         - id: user-service

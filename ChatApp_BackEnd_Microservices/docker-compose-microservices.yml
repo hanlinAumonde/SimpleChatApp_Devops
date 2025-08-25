@@ -75,11 +75,11 @@ services:
     restart: always
 
   rabbitmq:
-    image: rabbitmq:management
+    image: rabbitmq:latest
     container_name: chatapp-rabbitmq
     hostname: rabbitmq
-    ports:
-      - "15672:15672"
+#    ports:
+#      - "15672:15672"
     environment:
       - RABBITMQ_DEFAULT_USER=admin
       - RABBITMQ_DEFAULT_PASS=admin
@@ -119,21 +119,29 @@ services:
       timeout: 10s
       retries: 3
 
-  # 业务微服务（占位，后续阶段会添加）
-  # auth-service:
-  #   build: ./auth-service
-  #   container_name: chatapp-auth
-  #   hostname: auth-service
-  #   ports:
-  #     - "8081:8081"
-  #   depends_on:
-  #     - postgres
-  #     - redis
-  #     - eureka-server
-  #   networks:
-  #     - chatapp-network
-  #     - middleware-network
-  #   restart: always
+  # 业务微服务
+  auth-service:
+    build: ./auth-service
+    container_name: chatapp-auth
+    hostname: auth-service
+    ports:
+      - "8081:8081"
+    depends_on:
+      - postgres
+      - redis
+      - eureka-server
+    environment:
+      - DB_HOST=postgres
+      - DB_USERNAME=user
+      - DB_PASSWORD=password
+      - REDIS_HOST=redis
+      - RABBITMQ_HOST=rabbitmq
+      - RABBITMQ_USERNAME=admin
+      - RABBITMQ_PASSWORD=admin
+    networks:
+      - chatapp-network
+      - middleware-network
+    restart: always
 
 volumes:
   postgres-data:

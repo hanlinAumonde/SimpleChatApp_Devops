@@ -1,0 +1,82 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: auth-service
+    
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:localhost}:5432/chatAppDB
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:123456}
+    driver-class-name: org.postgresql.Driver
+    
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: false
+        
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: 6379
+      timeout: 2000ms
+      lettuce:
+        pool:
+          max-active: 8
+          max-wait: -1ms
+          max-idle: 8
+          min-idle: 0
+          
+  rabbitmq:
+    host: ${RABBITMQ_HOST:localhost}
+    port: 5672
+    username: ${RABBITMQ_USERNAME:admin}
+    password: ${RABBITMQ_PASSWORD:admin}
+    
+  # 邮件配置
+  mail:
+    host: smtp.your-email-provider.com
+    port: 587
+    username: your-email-address@mail.com
+    password: your-generated-password
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://eureka-server:8761/eureka/
+  instance:
+    prefer-ip-address: true
+    hostname: auth-service
+
+# JWT配置
+chatroomApp:
+  FrontEndURL: ${FRONT_URL:http://localhost:4200}
+  jwt:
+    secret: 404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970
+    loginTokenExpirationTime: 1440  # 24小时(分钟)
+    resetPwdTokenExpirationTime: 10  # 10分钟
+  rememberMe:
+    key: myRememberMeKey
+    expirationTime: 86400  # 24小时(秒)
+  pageable:
+    DefaultPageSize_Users: 5
+  redis:
+    expirationTime: 300  # Redis缓存过期时间(秒)
+  VERIFICATION_CODE_LOGIN_ENDPOINT: /api/auth/login-verification-code
+  MAX_FAILED_ATTEMPTS: 3
+
+logging:
+  level:
+    com.devStudy.chatapp.auth: DEBUG
+    org.springframework.security: DEBUG
