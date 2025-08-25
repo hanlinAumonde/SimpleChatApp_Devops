@@ -28,9 +28,6 @@ ChatApp_BackEnd_Microservices/
 # 进入微服务目录
 cd ChatApp_BackEnd_Microservices
 
-# 运行构建脚本
-build-all.bat
-```
 
 **Linux/Mac:**
 ```bash
