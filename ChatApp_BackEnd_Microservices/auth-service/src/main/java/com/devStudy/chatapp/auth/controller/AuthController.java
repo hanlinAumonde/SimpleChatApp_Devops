@@ -1,5 +1,6 @@
 package com.devStudy.chatapp.auth.controller;
 
+import com.devStudy.chatapp.auth.dto.DTOMapper;
 import com.devStudy.chatapp.auth.model.User;
 import com.devStudy.chatapp.auth.service.BlackListService;
 import com.devStudy.chatapp.auth.utils.RabbitMQUtil;
@@ -129,5 +130,15 @@ public class AuthController {
 		return ResponseEntity.ok(Map.ofEntries(
 				Map.entry("message", resultMsg)
 		));
+	}
+
+	/**
+	 * 通过邮箱获取用户信息（供网关使用）
+	 */
+	@GetMapping("/user-info")
+	public ResponseEntity<UserDTO> getUserInfo(@RequestParam String email) {
+		Optional<User> user = userService.findUserOrAdmin(email, false);
+		UserDTO userDTO = user.map(DTOMapper::toUserDTO).orElse(new UserDTO());
+		return ResponseEntity.ok(userDTO);
 	}
 }

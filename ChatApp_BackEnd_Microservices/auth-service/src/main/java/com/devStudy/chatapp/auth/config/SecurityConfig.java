@@ -8,7 +8,6 @@ import javax.sql.DataSource;
 import com.devStudy.chatapp.auth.security.LoginAuthenticationFailureHandler;
 import com.devStudy.chatapp.auth.security.loginPassword.AccountAuthenticationProvider;
 import com.devStudy.chatapp.auth.security.LoginAuthenticationSuccessHandler;
-import com.devStudy.chatapp.auth.security.loginPassword.JwtAuthenticationFilter;
 import com.devStudy.chatapp.auth.security.loginVerificationCode.VerificationCodeAuthenticationFilter;
 import com.devStudy.chatapp.auth.security.loginVerificationCode.VerificationCodeAuthenticationProvider;
 import com.devStudy.chatapp.auth.service.BlackListService;
@@ -103,7 +102,6 @@ public class SecurityConfig {
                                     PersistentTokenRepository persistentTokenRepository,
                                     UserService userDetailService,
                                     BlackListService blackListService,
-                                    JwtAuthenticationFilter jwtAuthenticationFilter,
                                     VerificationCodeAuthenticationFilter verificationCodeAuthenticationFilter,
                                     JwtTokenService jwtTokenService) throws Exception {
         return http
@@ -135,7 +133,6 @@ public class SecurityConfig {
                         .anyRequest().authenticated()
                 )
 
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterAfter(verificationCodeAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
 
                 .formLogin(formLogin -> 
