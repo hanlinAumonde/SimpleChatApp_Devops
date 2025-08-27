@@ -20,21 +20,20 @@ spring:
           predicates:
             - Path=/api/auth/**
         
-        # 用户服务路由
-        - id: user-service
-          uri: lb://user-service
+        # CRUD服务路由 (包含用户查询和聊天室管理)
+        - id: crud-service-users
+          uri: lb://crud-service
           predicates:
             - Path=/api/users/**
           filters:
-            - StripPrefix=1  # 去掉 /api 前缀
+            - AuthenticationGatewayFilter  # 添加认证过滤器
         
-        # 聊天室服务路由
-        - id: chatroom-service
-          uri: lb://chatroom-service
+        - id: crud-service-chatrooms
+          uri: lb://crud-service
           predicates:
             - Path=/api/chatrooms/**
           filters:
-            - StripPrefix=1  # 去掉 /api 前缀
+            - AuthenticationGatewayFilter  # 添加认证过滤器
         
         # 消息服务路由
         - id: message-service
@@ -43,6 +42,7 @@ spring:
             - Path=/api/messages/**
           filters:
             - StripPrefix=2  # 去掉 /api/messages 前缀
+            - AuthenticationGatewayFilter  # 添加认证过滤器
         
         # WebSocket网关路由
         - id: websocket-gateway
@@ -97,3 +97,8 @@ logging:
   level:
     org.springframework.cloud.gateway: DEBUG
     org.springframework.cloud.netflix.eureka: INFO
+
+# JWT配置
+chatroomApp:
+  jwt:
+    secret: 404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970
