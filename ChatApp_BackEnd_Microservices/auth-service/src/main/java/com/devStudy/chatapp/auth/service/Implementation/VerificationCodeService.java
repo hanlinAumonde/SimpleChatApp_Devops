@@ -1,5 +1,6 @@
-package com.devStudy.chatapp.auth.service;
+package com.devStudy.chatapp.auth.service.Implementation;
 
+import com.devStudy.chatapp.auth.service.Interface.IVerificationCodeService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +16,7 @@ import static com.devStudy.chatapp.auth.utils.ConstantValues.ATTEMPTS_PREFIX;
 import static com.devStudy.chatapp.auth.utils.ConstantValues.CODE_PREFIX;
 
 @Service
-public class VerificationCodeService {
+public class VerificationCodeService implements IVerificationCodeService {
     private static final Logger logger = LoggerFactory.getLogger(VerificationCodeService.class);
 
     private final EmailService emailService;
@@ -30,6 +31,7 @@ public class VerificationCodeService {
         this.redisTemplate = redisTemplate;
     }
 
+    @Override
     public void sendCode(String email) {
         String code = generateRandomCode();
         logger.info("Sending code to {}, code : {}", email, code);
@@ -42,6 +44,7 @@ public class VerificationCodeService {
         sendEmailWithCode(email, code);
     }
 
+    @Override
     public boolean validateCode(String email, String code) throws BadCredentialsException {
         String storedCode = (String) redisTemplate.opsForValue().get(CODE_PREFIX + email);
         if (storedCode == null) {
@@ -54,6 +57,7 @@ public class VerificationCodeService {
         return false;
     }
 
+    @Override
     public int incrementLoginAttempts(String email) {
         String key = ATTEMPTS_PREFIX + email;
         Long attempts = redisTemplate.opsForValue().increment(key);
@@ -65,6 +69,7 @@ public class VerificationCodeService {
         return attempts != null ? attempts.intValue() : 1;
     }
 
+    @Override
     public void invalideteCode(String email) {
         redisTemplate.delete(CODE_PREFIX + email);
         redisTemplate.delete(ATTEMPTS_PREFIX + email);

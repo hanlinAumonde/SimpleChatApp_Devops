@@ -40,7 +40,7 @@ services:
       - eureka-server
       # - config-server (暂时禁用)
     environment:
-      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
+      - EUREKA_SERVER_URL=http://eureka-server:8761/eureka
       - REDIS_HOST=redis
     networks:
       - chatapp-network
@@ -138,6 +138,7 @@ services:
       - RABBITMQ_HOST=rabbitmq
       - RABBITMQ_USERNAME=admin
       - RABBITMQ_PASSWORD=admin
+      - EUREKA_SERVER_URL=http://eureka-server:8761/eureka
     networks:
       - chatapp-network
       - middleware-network
@@ -160,6 +161,26 @@ services:
       - RABBITMQ_HOST=rabbitmq
       - RABBITMQ_USERNAME=admin
       - RABBITMQ_PASSWORD=admin
+      - EUREKA_SERVER_URL=http://eureka-server:8761/eureka
+    networks:
+      - chatapp-network
+      - middleware-network
+    restart: always
+
+  message-service:
+    build: ./message-service
+    container_name: chatapp-message
+    hostname: message-service
+    ports:
+      - "8084:8084"
+    depends_on:
+      - mongodb
+      - eureka-server
+    environment:
+      - MONGO_HOST=mongodb
+      - MONGO_PORT=27017
+      - MONGO_DBNAME=ChatApp
+      - EUREKA_SERVER_URL=http://eureka-server:8761/eureka
     networks:
       - chatapp-network
       - middleware-network

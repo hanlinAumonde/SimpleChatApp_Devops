@@ -1,7 +1,7 @@
 package com.devStudy.chatapp.crud.controller;
 
 import com.devStudy.chatapp.crud.dto.UserDTO;
-import com.devStudy.chatapp.crud.service.UserService;
+import com.devStudy.chatapp.crud.service.Implementation.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

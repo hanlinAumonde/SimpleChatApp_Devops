@@ -10,8 +10,8 @@ import com.devStudy.chatapp.auth.security.loginPassword.AccountAuthenticationPro
 import com.devStudy.chatapp.auth.security.LoginAuthenticationSuccessHandler;
 import com.devStudy.chatapp.auth.security.loginVerificationCode.VerificationCodeAuthenticationFilter;
 import com.devStudy.chatapp.auth.security.loginVerificationCode.VerificationCodeAuthenticationProvider;
-import com.devStudy.chatapp.auth.service.BlackListService;
-import com.devStudy.chatapp.auth.service.JwtTokenService;
+import com.devStudy.chatapp.auth.service.Implementation.BlackListService;
+import com.devStudy.chatapp.auth.service.Implementation.JwtTokenService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Value;
@@ -30,7 +30,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
 
-import com.devStudy.chatapp.auth.service.UserService;
+import com.devStudy.chatapp.auth.service.Implementation.UserService;
 
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.web.csrf.*;

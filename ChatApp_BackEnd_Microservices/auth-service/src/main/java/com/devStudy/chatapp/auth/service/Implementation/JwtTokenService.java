@@ -1,5 +1,6 @@
-package com.devStudy.chatapp.auth.service;
+package com.devStudy.chatapp.auth.service.Implementation;
 
+import com.devStudy.chatapp.auth.service.Interface.IJwtTokenService;
 import io.jsonwebtoken.*;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -24,7 +25,7 @@ import static com.devStudy.chatapp.auth.utils.ConstantValues.JWT_TOKEN_COOKIE_NA
 import static com.devStudy.chatapp.auth.utils.ConstantValues.TOKEN_FLAG_LOGIN;
 
 @Service
-public class JwtTokenService {
+public class JwtTokenService implements IJwtTokenService {
 	private static final Logger LOGGER = LoggerFactory.getLogger(JwtTokenService.class);
 	
 	@Value("${chatroomApp.jwt.secret}")
@@ -41,6 +42,7 @@ public class JwtTokenService {
     	return Keys.hmacShaKeyFor(keyBytes);
     }
 
+    @Override
 	public String generateJwtToken(String email, String tokenFlag) {
 		Instant now = Instant.now();
 		Instant expiration = now.plusMillis(60 * 1000
@@ -58,6 +60,7 @@ public class JwtTokenService {
     /**
      * 验证令牌是否有效
      */
+    @Override
     public boolean validateToken(String token) {
         return executeWithExceptionHandling(
                 () -> isNotExpired(token),
@@ -69,6 +72,7 @@ public class JwtTokenService {
     /**
      * 验证令牌并获取邮箱
      */
+    @Override
     public String validateTokenAndGetEmail(String token) {
         return executeWithExceptionHandling(
                 () -> isNotExpired(token) ? getSubject(token) : null,
@@ -80,6 +84,7 @@ public class JwtTokenService {
     /**
      * 获取令牌过期时间
      */
+    @Override
     public Date getExpirationDate(String token) {
         return executeWithExceptionHandling(
                 () -> getClaimFromToken(token, Claims::getExpiration),
@@ -91,6 +96,7 @@ public class JwtTokenService {
     /**
      * 从Cookie中获取JWT令牌
      */
+    @Override
     public String getTokenFromCookie(HttpServletRequest request) {
         if (request.getCookies() == null) {
             return null;

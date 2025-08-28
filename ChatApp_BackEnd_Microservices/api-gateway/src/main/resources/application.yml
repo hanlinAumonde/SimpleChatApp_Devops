@@ -41,7 +41,6 @@ spring:
           predicates:
             - Path=/api/messages/**
           filters:
-            - StripPrefix=2  # 去掉 /api/messages 前缀
             - AuthenticationGatewayFilter  # 添加认证过滤器
         
         # WebSocket网关路由
@@ -70,7 +69,7 @@ spring:
 eureka:
   client:
     service-url:
-      defaultZone: ${EUREKA_CLIENT_SERVICEURL_DEFAULTZONE:http://eureka-server:8761/eureka/}
+      defaultZone: ${EUREKA_SERVER_URL:http://localhost:8761/eureka}
     registry-fetch-interval-seconds: 30
     fetch-registry: true
     register-with-eureka: true

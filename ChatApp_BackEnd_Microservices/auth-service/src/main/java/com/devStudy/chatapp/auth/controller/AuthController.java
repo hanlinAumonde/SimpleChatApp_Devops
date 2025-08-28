@@ -2,7 +2,7 @@ package com.devStudy.chatapp.auth.controller;
 
 import com.devStudy.chatapp.auth.dto.DTOMapper;
 import com.devStudy.chatapp.auth.model.User;
-import com.devStudy.chatapp.auth.service.BlackListService;
+import com.devStudy.chatapp.auth.service.Implementation.BlackListService;
 import com.devStudy.chatapp.auth.utils.RabbitMQUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
@@ -18,8 +18,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.devStudy.chatapp.auth.dto.CreateCompteDTO;
 import com.devStudy.chatapp.auth.dto.UserDTO;
-import com.devStudy.chatapp.auth.service.JwtTokenService;
-import com.devStudy.chatapp.auth.service.UserService;
+import com.devStudy.chatapp.auth.service.Implementation.JwtTokenService;
+import com.devStudy.chatapp.auth.service.Implementation.UserService;
 
 import java.util.Map;
 import java.util.Optional;

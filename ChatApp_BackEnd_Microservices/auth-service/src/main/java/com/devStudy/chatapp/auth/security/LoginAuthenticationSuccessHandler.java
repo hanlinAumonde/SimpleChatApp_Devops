@@ -1,6 +1,6 @@
 package com.devStudy.chatapp.auth.security;
 
-import com.devStudy.chatapp.auth.service.JwtTokenService;
+import com.devStudy.chatapp.auth.service.Implementation.JwtTokenService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;

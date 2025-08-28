@@ -11,8 +11,8 @@ import com.devStudy.chatapp.crud.dto.ChatroomWithOwnerAndStatusDTO;
 import com.devStudy.chatapp.crud.dto.ModifyChatroomDTO;
 import com.devStudy.chatapp.crud.dto.ModifyChatroomRequestDTO;
 import com.devStudy.chatapp.crud.dto.UserDTO;
-import com.devStudy.chatapp.crud.service.ChatroomService;
-import com.devStudy.chatapp.crud.service.UserService;
+import com.devStudy.chatapp.crud.service.Implementation.ChatroomService;
+import com.devStudy.chatapp.crud.service.Implementation.UserService;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -1,8 +1,8 @@
 package com.devStudy.chatapp.crud.controller;
 
 import com.devStudy.chatapp.crud.dto.*;
-import com.devStudy.chatapp.crud.service.ChatroomService;
-import com.devStudy.chatapp.crud.service.UserService;
+import com.devStudy.chatapp.crud.service.Implementation.ChatroomService;
+import com.devStudy.chatapp.crud.service.Implementation.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -15,7 +15,6 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;

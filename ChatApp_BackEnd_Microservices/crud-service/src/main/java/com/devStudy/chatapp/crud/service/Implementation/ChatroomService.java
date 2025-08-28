@@ -1,5 +1,6 @@
-package com.devStudy.chatapp.crud.service;
+package com.devStudy.chatapp.crud.service.Implementation;
 
+import com.devStudy.chatapp.crud.service.Interface.IChatroomService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +31,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 
 @Service
-public class ChatroomService {
+public class ChatroomService implements IChatroomService {
 
     private final Logger logger = LoggerFactory.getLogger(ChatroomService.class);
 
@@ -48,11 +49,14 @@ public class ChatroomService {
         this.publisher = publisher;
     }
 
+    @Transactional(readOnly = true)
+    @Override
     public Optional<ModifyChatroomDTO> findChatroom(long chatroomId) {
     	return chatroomRepository.findById(chatroomId).map(DTOMapper::toModifyChatroomDTO);
     }
 
     @Transactional
+    @Override
     public boolean createChatroom(ChatroomRequestDTO chatroomRequestDTO, long userId) {
         try {
             Chatroom chatroom = new Chatroom();
@@ -100,6 +104,7 @@ public class ChatroomService {
     }
 
     @Transactional(readOnly = true)
+    @Override
 	public Page<ChatroomDTO> getChatroomsOwnedOfUserByPage(long userId, int page) {
 		Page<Chatroom> chatrooms = getChatroomsOwnedOrJoinedOfUserByPage(userId, true, page);
 		return chatrooms.map(chatroom ->
@@ -108,6 +113,7 @@ public class ChatroomService {
 	}
 
     @Transactional(readOnly = true)
+    @Override
 	public Page<ChatroomWithOwnerAndStatusDTO> getChatroomsJoinedOfUserByPage(long userId, boolean isOwner, int page) {
     	Page<Chatroom> chatrooms = getChatroomsOwnedOrJoinedOfUserByPage(userId, isOwner, page);
     	return chatrooms.map(chatroom -> {
@@ -117,6 +123,7 @@ public class ChatroomService {
     }
 
     @Transactional(readOnly = true)
+    @Override
     public List<UserDTO> getAllUsersInChatroom(long chatroomId){
         List<User> allUsersInChatroom = new ArrayList<>();
         chatroomRepository.findById(chatroomId).ifPresent(
@@ -129,6 +136,7 @@ public class ChatroomService {
     }
 
     @Transactional
+    @Override
     public boolean deleteChatRoom(long chatroomId) {
         try{
         	chatroomRepository.findById(chatroomId).ifPresent(
@@ -153,11 +161,13 @@ public class ChatroomService {
     }
 
     @Transactional
+    @Override
     public void setStatusOfChatroom(long chatroomId, boolean status) {
         chatroomRepository.findById(chatroomId).ifPresent(chatroom -> chatroomRepository.updateActive(chatroom.getId(), status));
     }
 
     @Transactional
+    @Override
     public boolean deleteUserInvited(long chatroomId, long userId){
         try{
         	UserDTO user = new UserDTO();
@@ -183,6 +193,7 @@ public class ChatroomService {
     }
 
     @Transactional
+    @Override
     public boolean updateChatroom(ModifyChatroomRequestDTO chatroomRequestDTO, long chatroomId) {
         try{
             Chatroom chatroom = chatroomRepository.findById(chatroomId).orElseThrow();
@@ -252,6 +263,8 @@ public class ChatroomService {
         }
     }
 
+    @Transactional(readOnly = true)
+    @Override
     public boolean checkUserIsOwnerOfChatroom(long userId, long chatroomId) {
         try {
             return chatroomRepository.findByIdAndCreatorId(chatroomId, userId).isPresent();

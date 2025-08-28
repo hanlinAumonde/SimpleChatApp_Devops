@@ -1,7 +1,7 @@
 package com.devStudy.chatapp.auth.security.loginVerificationCode;
 
-import com.devStudy.chatapp.auth.service.UserService;
-import com.devStudy.chatapp.auth.service.VerificationCodeService;
+import com.devStudy.chatapp.auth.service.Implementation.UserService;
+import com.devStudy.chatapp.auth.service.Implementation.VerificationCodeService;
 import io.jsonwebtoken.lang.Assert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

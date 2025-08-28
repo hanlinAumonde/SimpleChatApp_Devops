@@ -1,5 +1,6 @@
-package com.devStudy.chatapp.crud.service;
+package com.devStudy.chatapp.crud.service.Implementation;
 
+import com.devStudy.chatapp.crud.service.Interface.IUserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +18,7 @@ import com.devStudy.chatapp.crud.model.User;
 import com.devStudy.chatapp.crud.repository.UserRepository;
 
 @Service
-public class UserService {
+public class UserService implements IUserService {
 	
 	private static final Logger LOGGER = LoggerFactory.getLogger(UserService.class);
 
@@ -35,6 +36,7 @@ public class UserService {
         return PageRequest.of(page, DefaultPageSize_Users, Sort.sort(User.class).by(User::getFirstName).ascending());
     }
 
+    @Override
     public long getUserIdFromHeaders(String userIdHeader) {
         try {
             return Long.parseLong(userIdHeader);
@@ -45,6 +47,7 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
+    @Override
     public Page<UserDTO> findAllOtherUsersNotAdminByPage(int page, long userId) {
         return userRepository.findAllOtherUsersNotAdminByPage(userId, this.getPageableSetting(page))
                 .map(DTOMapper::toUserDTO);
@@ -57,6 +60,7 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
+    @Override
     public Page<UserDTO> findUsersNotInvitedToChatroomByPage(long chatroomId, long userId, int page) {
         return userRepository.findUsersNotInvitedToChatroomByPage(chatroomId, userId, this.getPageableSetting(page))
                 .map(DTOMapper::toUserDTO);

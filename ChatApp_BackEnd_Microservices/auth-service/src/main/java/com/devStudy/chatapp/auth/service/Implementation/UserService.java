@@ -1,5 +1,6 @@
-package com.devStudy.chatapp.auth.service;
+package com.devStudy.chatapp.auth.service.Implementation;
 
+import com.devStudy.chatapp.auth.service.Interface.IUserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,16 +18,14 @@ import com.devStudy.chatapp.auth.dto.DTOMapper;
 import com.devStudy.chatapp.auth.dto.UserDTO;
 import com.devStudy.chatapp.auth.model.User;
 
-import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Objects;
 import java.util.Optional;
 
 import static com.devStudy.chatapp.auth.utils.ConstantValues.CompteExist;
 import static com.devStudy.chatapp.auth.utils.ConstantValues.CreationSuccess;
 
 @Service
-public class UserService implements UserDetailsService {
+public class UserService implements UserDetailsService, IUserService {
 	
 	private static final Logger LOGGER = LoggerFactory.getLogger(UserService.class);
 
@@ -44,6 +43,7 @@ public class UserService implements UserDetailsService {
     /**
      * 获取登录用户信息
      */
+    @Override
     public UserDTO getLoggedUser(String email) {
         return DTOMapper.toUserDTO(
         	findUserOrAdmin(email,false).orElse(new User())
@@ -54,6 +54,7 @@ public class UserService implements UserDetailsService {
      * 添加用户
      */
     @Transactional
+    @Override
     public CreateCompteDTO addUser(CreateCompteDTO user) {
         try {
             Optional<User> existingUser = findUserOrAdmin(user.getMail(), false);
@@ -81,6 +82,7 @@ public class UserService implements UserDetailsService {
      * 更新用户失败登录次数
      */
     @Transactional
+    @Override
     public int incrementFailedAttemptsOfUser(String userEmail) throws NoSuchElementException {
     	int failedAttempts = findUserOrAdmin(userEmail, false).orElseThrow().getFailedAttempts();
         userRepository.updateFailedAttempts(userEmail,failedAttempts+1);
@@ -91,6 +93,7 @@ public class UserService implements UserDetailsService {
      * 锁定用户并重置失败次数
      */
     @Transactional
+    @Override
     public void lockUserAndResetFailedAttempts(String userEmail) {
         userRepository.updateActive(userEmail,false);
         resetFailedAttemptsOfUser(userEmail);
@@ -99,6 +102,7 @@ public class UserService implements UserDetailsService {
     /**
      * 查找用户或管理员
      */
+    @Override
     public Optional<User> findUserOrAdmin(String email, boolean isAdmin) {
         return userRepository.findByMailAndAdmin(email, isAdmin);
     }
@@ -107,6 +111,7 @@ public class UserService implements UserDetailsService {
      * 重置密码
      */
     @Transactional
+    @Override
     public boolean resetPassword(String jwtToken, String password) {
 		String email = tokenService.validateTokenAndGetEmail(jwtToken);
 		if (email != null && !email.isEmpty()) {
@@ -132,6 +137,7 @@ public class UserService implements UserDetailsService {
 	}
 
 	@Transactional
+    @Override
 	public void resetFailedAttemptsOfUser(String username) {
         userRepository.updateFailedAttempts(username, 0);		
 	}

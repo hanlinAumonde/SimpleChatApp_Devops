@@ -3,6 +3,8 @@ package com.devStudy.chatapp.auth.service;
 import com.devStudy.chatapp.auth.dto.UserDTO;
 import com.devStudy.chatapp.auth.model.User;
 import com.devStudy.chatapp.auth.repository.UserRepository;
+import com.devStudy.chatapp.auth.service.Implementation.JwtTokenService;
+import com.devStudy.chatapp.auth.service.Implementation.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

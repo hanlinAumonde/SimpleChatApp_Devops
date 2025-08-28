@@ -7,6 +7,7 @@ import com.devStudy.chatapp.crud.model.Chatroom;
 import com.devStudy.chatapp.crud.model.User;
 import com.devStudy.chatapp.crud.repository.ChatroomRepository;
 import com.devStudy.chatapp.crud.repository.UserRepository;
+import com.devStudy.chatapp.crud.service.Implementation.ChatroomService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

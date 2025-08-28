@@ -1,8 +1,8 @@
 package com.devStudy.chatapp.auth.security.loginVerificationCode;
 
 import com.devStudy.chatapp.auth.model.User;
-import com.devStudy.chatapp.auth.service.UserService;
-import com.devStudy.chatapp.auth.service.VerificationCodeService;
+import com.devStudy.chatapp.auth.service.Implementation.UserService;
+import com.devStudy.chatapp.auth.service.Implementation.VerificationCodeService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -12,10 +12,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.test.util.ReflectionTestUtils;
-
-import java.util.Collections;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyString;

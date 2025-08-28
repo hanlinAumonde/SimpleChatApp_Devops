@@ -1,5 +1,6 @@
 package com.devStudy.chatapp.auth.service;
 
+import com.devStudy.chatapp.auth.service.Implementation.JwtTokenService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import org.junit.jupiter.api.BeforeEach;
@@ -10,7 +11,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
-import java.time.Instant;
 import java.util.Date;
 
 import static com.devStudy.chatapp.auth.utils.ConstantValues.JWT_TOKEN_COOKIE_NAME;

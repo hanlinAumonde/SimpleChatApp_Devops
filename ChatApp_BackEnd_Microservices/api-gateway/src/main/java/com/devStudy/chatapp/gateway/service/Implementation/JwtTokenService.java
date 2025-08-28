@@ -1,5 +1,6 @@
-package com.devStudy.chatapp.gateway.service;
+package com.devStudy.chatapp.gateway.service.Implementation;
 
+import com.devStudy.chatapp.gateway.service.Interface.IJwtTokenService;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -18,7 +19,7 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 @Service
-public class JwtTokenService {
+public class JwtTokenService implements IJwtTokenService {
     private static final Logger LOGGER = LoggerFactory.getLogger(JwtTokenService.class);
     
     private static final String JWT_TOKEN_COOKIE_NAME = "JWT-Token";
@@ -34,6 +35,7 @@ public class JwtTokenService {
     /**
      * 验证令牌并获取邮箱
      */
+    @Override
     public String validateTokenAndGetEmail(String token) {
         return executeWithExceptionHandling(
                 () -> isNotExpired(token) ? getSubject(token) : null,
@@ -44,6 +46,7 @@ public class JwtTokenService {
     /**
      * 获取令牌过期时间
      */
+    @Override
     public Date getExpirationDate(String token) {
         return executeWithExceptionHandling(
                 () -> getClaimFromToken(token, Claims::getExpiration),
@@ -54,6 +57,7 @@ public class JwtTokenService {
     /**
      * 从请求Cookie中获取JWT令牌
      */
+    @Override
     public String getTokenFromRequest(ServerWebExchange exchange) {
         return exchange.getRequest().getCookies()
                 .getFirst(JWT_TOKEN_COOKIE_NAME)

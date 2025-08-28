@@ -1,8 +1,8 @@
 package com.devStudy.chatapp.gateway.filter;
 
-import com.devStudy.chatapp.gateway.service.JwtTokenService;
-import com.devStudy.chatapp.gateway.service.RedisBlackListService;
-import com.devStudy.chatapp.gateway.service.UserService;
+import com.devStudy.chatapp.gateway.service.Implementation.JwtTokenService;
+import com.devStudy.chatapp.gateway.service.Implementation.RedisBlackListService;
+import com.devStudy.chatapp.gateway.service.Implementation.UserService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;

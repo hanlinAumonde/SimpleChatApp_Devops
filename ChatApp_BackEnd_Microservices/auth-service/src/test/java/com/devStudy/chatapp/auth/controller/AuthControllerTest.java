@@ -1,31 +1,24 @@
 package com.devStudy.chatapp.auth.controller;
 
-import com.devStudy.chatapp.auth.config.SecurityConfig;
 import com.devStudy.chatapp.auth.dto.CreateCompteDTO;
 import com.devStudy.chatapp.auth.dto.UserDTO;
 import com.devStudy.chatapp.auth.model.User;
-import com.devStudy.chatapp.auth.service.BlackListService;
-import com.devStudy.chatapp.auth.service.JwtTokenService;
-import com.devStudy.chatapp.auth.service.UserService;
+import com.devStudy.chatapp.auth.service.Implementation.BlackListService;
+import com.devStudy.chatapp.auth.service.Implementation.JwtTokenService;
+import com.devStudy.chatapp.auth.service.Implementation.UserService;
 import com.devStudy.chatapp.auth.utils.RabbitMQUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
 
-import javax.sql.DataSource;
 import java.time.Instant;
 import java.util.Date;
 import java.util.Map;
@@ -113,9 +106,9 @@ class AuthControllerTest {
                 .andExpect(jsonPath("$.lastName").value("Doe"))
                 .andExpect(jsonPath("$.mail").value("john.doe@test.com"));
 
-        verify(jwtTokenService,times(2)).getTokenFromCookie(any(HttpServletRequest.class));
-        verify(blackListService,times(2)).isTokenInBlackList(validToken);
-        verify(jwtTokenService,times(2)).validateTokenAndGetEmail(validToken);
+        verify(jwtTokenService).getTokenFromCookie(any(HttpServletRequest.class));
+        verify(blackListService).isTokenInBlackList(validToken);
+        verify(jwtTokenService).validateTokenAndGetEmail(validToken);
         verify(userService).getLoggedUser("john.doe@test.com");
     }
 
@@ -129,7 +122,7 @@ class AuthControllerTest {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.id").value(0L));
 
-        verify(jwtTokenService,times(2)).getTokenFromCookie(any(HttpServletRequest.class));
+        verify(jwtTokenService).getTokenFromCookie(any(HttpServletRequest.class));
         verify(blackListService, never()).isTokenInBlackList(anyString());
         verify(userService, never()).getLoggedUser(anyString());
     }
@@ -148,7 +141,7 @@ class AuthControllerTest {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.id").value(0L));
 
-        verify(blackListService,times(2)).isTokenInBlackList(blacklistedToken);
+        verify(blackListService).isTokenInBlackList(blacklistedToken);
         verify(jwtTokenService, never()).validateTokenAndGetEmail(anyString());
         verify(userService, never()).getLoggedUser(anyString());
     }
@@ -362,9 +355,8 @@ class AuthControllerTest {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.message").value("Logout successful"));
 
-        verify(jwtTokenService,times(2)).getTokenFromCookie(any(HttpServletRequest.class));
+        verify(jwtTokenService).getTokenFromCookie(any(HttpServletRequest.class));
         verify(jwtTokenService).validateToken(validToken);
-        verify(jwtTokenService).validateTokenAndGetEmail(validToken);
         verify(blackListService).addTokenToBlackList(eq(validToken), anyLong());
     }
 
@@ -378,7 +370,7 @@ class AuthControllerTest {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.message").value("Unnecessary logout, you are not logged in"));
 
-        verify(jwtTokenService,times(2)).getTokenFromCookie(any(HttpServletRequest.class));
+        verify(jwtTokenService).getTokenFromCookie(any(HttpServletRequest.class));
         verify(blackListService, never()).addTokenToBlackList(anyString(), anyLong());
     }
 }

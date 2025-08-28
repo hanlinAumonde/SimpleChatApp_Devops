@@ -1,5 +1,6 @@
-package com.devStudy.chatapp.auth.service;
+package com.devStudy.chatapp.auth.service.Implementation;
 
+import com.devStudy.chatapp.auth.service.Interface.IBlackListService;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
@@ -8,7 +9,7 @@ import java.util.concurrent.TimeUnit;
 import static com.devStudy.chatapp.auth.utils.ConstantValues.BLACKLIST_PREFIX;
 
 @Service
-public class BlackListService {
+public class BlackListService implements IBlackListService {
 
     private final RedisTemplate<String, Object> redisTemplate;
 
@@ -16,6 +17,7 @@ public class BlackListService {
         this.redisTemplate = redisTemplate;
     }
 
+    @Override
     public void addTokenToBlackList(String token, Long expirationTime) {
         long ttl = expirationTime - System.currentTimeMillis();
         if (ttl > 0) {
@@ -23,6 +25,7 @@ public class BlackListService {
         }
     }
 
+    @Override
     public boolean isTokenInBlackList(String token) {
         return redisTemplate.hasKey(BLACKLIST_PREFIX + token);
     }

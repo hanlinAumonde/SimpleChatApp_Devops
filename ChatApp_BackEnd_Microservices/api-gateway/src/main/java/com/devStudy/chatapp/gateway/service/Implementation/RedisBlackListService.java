@@ -1,5 +1,6 @@
-package com.devStudy.chatapp.gateway.service;
+package com.devStudy.chatapp.gateway.service.Implementation;
 
+import com.devStudy.chatapp.gateway.service.Interface.IRedisBlackListService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,7 +12,7 @@ import java.time.Duration;
 import java.time.Instant;
 
 @Service
-public class RedisBlackListService {
+public class RedisBlackListService implements IRedisBlackListService {
     private static final Logger LOGGER = LoggerFactory.getLogger(RedisBlackListService.class);
     
     // 与认证服务保持一致的前缀
@@ -27,6 +28,7 @@ public class RedisBlackListService {
     /**
      * 检查Token是否在黑名单中
      */
+    @Override
     public Mono<Boolean> isTokenInBlackList(String token) {
         String key = BLACKLIST_PREFIX + token;
         return reactiveRedisTemplate.hasKey(key)
@@ -37,6 +39,7 @@ public class RedisBlackListService {
     /**
      * 将Token加入黑名单
      */
+    @Override
     public Mono<Boolean> addTokenToBlackList(String token, long expirationTime) {
         String key = BLACKLIST_PREFIX + token;
         long currentTime = Instant.now().toEpochMilli();
