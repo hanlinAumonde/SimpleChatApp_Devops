@@ -255,12 +255,12 @@ class EventPublisherTest {
         // 验证事件监听器方法有正确的注解
         assertThat(EventPublisher.class
                 .getMethod("handleChatroomMemberChangeEvent", ChangeChatroomMemberEvent.class)
-                .isAnnotationPresent(org.springframework.context.event.EventListener.class))
+                .isAnnotationPresent(org.springframework.transaction.event.TransactionalEventListener.class))
                 .isTrue();
 
         assertThat(EventPublisher.class
                 .getMethod("handleRemoveChatroomEvent", RemoveChatroomEvent.class)
-                .isAnnotationPresent(org.springframework.context.event.EventListener.class))
+                .isAnnotationPresent(org.springframework.transaction.event.TransactionalEventListener.class))
                 .isTrue();
     }
 

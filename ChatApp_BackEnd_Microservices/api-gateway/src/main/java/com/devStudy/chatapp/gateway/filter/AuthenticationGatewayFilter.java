@@ -85,9 +85,9 @@ public class AuthenticationGatewayFilter extends AbstractGatewayFilterFactory<Au
                                     ServerHttpRequest modifiedRequest = exchange.getRequest()
                                             .mutate()
                                             .header("X-User-Id", userInfo.getId().toString())
-                                            .header("X-User-Email", userInfo.getEmail())
-                                            .header("X-User-Name", userInfo.getUsername())
-                                            .header("X-User-Role", userInfo.getRole())
+                                            .header("X-User-Email", userInfo.getMail())
+                                            .header("X-User-FirstName", userInfo.getFirstName())
+                                            .header("X-User-LastName", userInfo.getLastName())
                                             .build();
 
                                     ServerWebExchange modifiedExchange = exchange.mutate()

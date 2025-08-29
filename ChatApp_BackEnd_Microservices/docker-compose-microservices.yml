@@ -186,6 +186,32 @@ services:
       - middleware-network
     restart: always
 
+  websocket-gateway:
+    build: ./websocket-gateway
+    container_name: chatapp-websocket
+    hostname: websocket-gateway
+    ports:
+      - "8086:8086"
+    depends_on:
+      - redis
+      - rabbitmq
+      - eureka-server
+      - auth-service
+      - crud-service
+      - message-service
+    environment:
+      - REDIS_HOST=redis
+      - RABBITMQ_HOST=rabbitmq
+      - RABBITMQ_USERNAME=admin
+      - RABBITMQ_PASSWORD=admin
+      - EUREKA_SERVER_URL=http://eureka-server:8761/eureka
+      - FRONT_URL=http://frontend:80,https://frontend:443
+      - HOSTNAME=websocket-gateway
+    networks:
+      - chatapp-network
+      - middleware-network
+    restart: always
+
 volumes:
   postgres-data:
   mongodb-data:

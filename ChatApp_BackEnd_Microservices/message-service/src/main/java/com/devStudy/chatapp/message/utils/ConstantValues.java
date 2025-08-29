@@ -15,17 +15,4 @@ public final class ConstantValues {
     public static final String MSG_CONTENT = "content";
     public static final String MSG_LATEST_DATE_SIGN = "latestDateSign";
 
-    // WebSocket broadcast types
-    public static final String TO_ALL_IN_CHATROOM = "toAll";
-    public static final String TO_SELF_IN_CHATROOM = "toSelf";
-    public static final String TO_OTHERS_IN_CHATROOM = "toOthers";
-    
-    // Message types for websocket
-    public static final int MESSAGE_TEXT = 0;
-    public static final int MESSAGE_CONNECT = 1;
-    public static final int MESSAGE_DISCONNECT = 2;
-    public static final int MESSAGE_REMOVE_CHATROOM = 3;
-    public static final int MESSAGE_ADD_CHATROOM_MEMBER = 4;
-    public static final int MESSAGE_REMOVE_CHATROOM_MEMBER = 5;
-
 }

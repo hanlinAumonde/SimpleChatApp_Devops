@@ -10,7 +10,7 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class RabbitMQConfig {
 
-    public static final String EXCHANGE_NAME = "topics-exchange";
+    public static final String EXCHANGE_NAME = "chatroom-event-exchange";
     
     // Routing keys for different event types
     public static final String CHATROOM_MEMBER_CHANGE_ROUTING_KEY = "chatroom.member.change";

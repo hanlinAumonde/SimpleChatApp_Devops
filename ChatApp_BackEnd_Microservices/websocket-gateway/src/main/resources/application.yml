@@ -1,0 +1,97 @@
+spring:
+  application:
+    name: websocket-gateway
+    
+  # Redis配置
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      timeout: 2000ms
+      jedis:
+        pool:
+          max-active: 8
+          max-wait: -1ms
+          max-idle: 8
+          min-idle: 0
+      
+  # RabbitMQ配置
+  rabbitmq:
+    host: ${RABBITMQ_HOST:localhost}
+    port: ${RABBITMQ_PORT:5672}
+    username: ${RABBITMQ_USERNAME:admin}
+    password: ${RABBITMQ_PASSWORD:admin}
+
+  cloud:
+    openfeign:
+      client:
+        config:
+          default:
+            connect-timeout: 5000
+            read-timeout: 10000
+            logger-level: basic
+          auth-service:
+            connect-timeout: 3000
+            read-timeout: 5000
+          crud-service:
+            connect-timeout: 3000
+            read-timeout: 5000
+          message-service:
+            connect-timeout: 5000
+            read-timeout: 10000
+      # 启用HTTP/2
+      httpclient:
+        enabled: true
+
+# 服务器配置
+server:
+  port: ${SERVER_PORT:8086}
+  servlet:
+    context-path: /
+
+# WebSocket配置
+websocket:
+  chat:
+    endpoint: /ws/chatroom/{chatroomId}/user/{userId}
+    allowed-origins: ${FRONT_URL:http://localhost:4200}
+    session-expiry: 86400  # 24小时（秒）
+    redis:
+      chatroom-channel: "channel:chatroom:%d"
+      chatroom-users-key: chatroom:%d:user:%d
+
+# Eureka配置
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_SERVER_URL:http://localhost:8761/eureka/}
+    fetch-registry: true
+    register-with-eureka: true
+  instance:
+    prefer-ip-address: true
+    hostname: ${HOSTNAME:websocket-gateway}
+    lease-renewal-interval-in-seconds: 30
+    lease-expiration-duration-in-seconds: 90
+
+# 日志配置
+logging:
+  level:
+    com.devStudy.chatapp.websocket: INFO
+    org.springframework.web.socket: INFO
+    org.springframework.cloud.openfeign: DEBUG
+    redis: INFO
+    rabbitmq: INFO
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: when-authorized
+  info:
+    env:
+      enabled: true

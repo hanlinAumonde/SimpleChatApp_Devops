@@ -45,9 +45,11 @@ spring:
         
         # WebSocket网关路由
         - id: websocket-gateway
-          uri: lb://websocket-gateway
+          uri: lb:ws://websocket-gateway
           predicates:
             - Path=/ws/**
+          filters:
+            - AuthenticationGatewayFilter  # 添加认证过滤器，验证JWT并传递用户信息
 
       # 全局CORS配置
       globalcors:
@@ -74,7 +76,7 @@ eureka:
     fetch-registry: true
     register-with-eureka: true
   instance:
-    prefer-ip-address: false
+    prefer-ip-address: true
     hostname: ${HOSTNAME:api-gateway}
     lease-renewal-interval-in-seconds: 10
     lease-expiration-duration-in-seconds: 30

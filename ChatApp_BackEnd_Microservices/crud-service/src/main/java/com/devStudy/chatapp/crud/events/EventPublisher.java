@@ -4,14 +4,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
 import com.devStudy.chatapp.crud.config.RabbitMQConfig;
-import com.devStudy.chatapp.crud.dto.UserDTO;
+import org.springframework.transaction.event.TransactionPhase;
+import org.springframework.transaction.event.TransactionalEventListener;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 @Component
@@ -19,10 +18,14 @@ public class EventPublisher {
     
     private static final Logger logger = LoggerFactory.getLogger(EventPublisher.class);
     
+    private final RabbitTemplate rabbitTemplate;
+
     @Autowired
-    private RabbitTemplate rabbitTemplate;
+    EventPublisher(RabbitTemplate rabbitTemplate) {
+        this.rabbitTemplate = rabbitTemplate;
+    }
     
-    @EventListener
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handleChatroomMemberChangeEvent(ChangeChatroomMemberEvent event) {
         try {
             Map<String, Object> message = new HashMap<>();
@@ -42,7 +45,7 @@ public class EventPublisher {
         }
     }
     
-    @EventListener
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handleRemoveChatroomEvent(RemoveChatroomEvent event) {
         try {
             Map<String, Object> message = new HashMap<>();
