@@ -4,9 +4,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import com.devStudy.chatapp.crud.config.RabbitMQConfig;
 import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
 
@@ -19,6 +19,15 @@ public class EventPublisher {
     private static final Logger logger = LoggerFactory.getLogger(EventPublisher.class);
     
     private final RabbitTemplate rabbitTemplate;
+
+    @Value("${chatroomApp.rabbitmq.RABBITMQ_EXCHANGE_NAME}")
+    private String EXCHANGE_NAME;
+
+    @Value("${chatroomApp.rabbitmq.CHATROOM_MEMBER_CHANGE_ROUTING_KEY}")
+    private String CHATROOM_MEMBER_CHANGE_ROUTING_KEY;
+
+    @Value("${chatroomApp.rabbitmq.CHATROOM_REMOVE_ROUTING_KEY}")
+    private String CHATROOM_REMOVE_ROUTING_KEY;
 
     @Autowired
     EventPublisher(RabbitTemplate rabbitTemplate) {
@@ -34,7 +43,7 @@ public class EventPublisher {
             message.put("removedMembers", event.getRemovedMembers());
             message.put("eventType", "CHATROOM_MEMBER_CHANGE");
             
-            rabbitTemplate.convertAndSend(RabbitMQConfig.EXCHANGE_NAME, RabbitMQConfig.CHATROOM_MEMBER_CHANGE_ROUTING_KEY, message);
+            rabbitTemplate.convertAndSend(EXCHANGE_NAME, CHATROOM_MEMBER_CHANGE_ROUTING_KEY, message);
             
             logger.info("Published chatroom member change event for chatroom {}: added={}, removed={}", 
                        event.getChatroomId(), 
@@ -52,7 +61,7 @@ public class EventPublisher {
             message.put("chatroomId", event.getEventMsg());
             message.put("eventType", "CHATROOM_REMOVE");
             
-            rabbitTemplate.convertAndSend(RabbitMQConfig.EXCHANGE_NAME, RabbitMQConfig.CHATROOM_REMOVE_ROUTING_KEY, message);
+            rabbitTemplate.convertAndSend(EXCHANGE_NAME, CHATROOM_REMOVE_ROUTING_KEY, message);
             
             logger.info("Published chatroom remove event for chatroom {}", event.getEventMsg());
         } catch (Exception e) {

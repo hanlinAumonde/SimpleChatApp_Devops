@@ -41,7 +41,7 @@ public class UserService implements UserDetailsService, IUserService {
     }
 
     /**
-     * 获取登录用户信息
+     * Obtain logged-in user information
      */
     @Override
     public UserDTO getLoggedUser(String email) {
@@ -51,7 +51,7 @@ public class UserService implements UserDetailsService, IUserService {
     }
 
     /**
-     * 添加用户
+     * Add new user
      */
     @Transactional
     @Override
@@ -79,7 +79,7 @@ public class UserService implements UserDetailsService, IUserService {
     }
 
     /**
-     * 更新用户失败登录次数
+     * Update user's failed login attempts
      */
     @Transactional
     @Override
@@ -90,7 +90,7 @@ public class UserService implements UserDetailsService, IUserService {
     }
 
     /**
-     * 锁定用户并重置失败次数
+     * Lock user account and reset failed attempts
      */
     @Transactional
     @Override
@@ -100,7 +100,7 @@ public class UserService implements UserDetailsService, IUserService {
     }
 
     /**
-     * 查找用户或管理员
+     * Find user by email and role
      */
     @Override
     public Optional<User> findUserOrAdmin(String email, boolean isAdmin) {
@@ -108,7 +108,7 @@ public class UserService implements UserDetailsService, IUserService {
     }
 
     /**
-     * 重置密码
+     * reset password using JWT token
      */
     @Transactional
     @Override

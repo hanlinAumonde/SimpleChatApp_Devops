@@ -69,16 +69,16 @@ public class DistributedChatWebSocketHandler extends TextWebSocketHandler {
         LOGGER.info("WebSocket connection established: user {} in chatroom {}", userId, chatroomId);
 
         try {
-            // 1. 注册用户到Redis分布式会话表
+            // 1. Inscribe user connection in the distributed registry
             chatSessionRegistryService.registerUserConnection(chatroomId, userInfo);
 
-            // 2. 添加到本地会话管理
+            // 2. Add to local session map
             addLocalSession(chatroomId, userId, session);
 
-            // 3. 订阅聊天室Redis频道（如果尚未订阅）
+            // 3. Subscribe to Redis channel if not already subscribed
             subscribeToChatroomChannel(chatroomId);
 
-            // 4. 广播用户上线消息给所有用户
+            // 4. Broadcast user online message (to all users including self)
             Date now = new Date();
             broadcastMessage(
                 WebSocketConstants.MESSAGE_CONNECT,
@@ -89,7 +89,7 @@ public class DistributedChatWebSocketHandler extends TextWebSocketHandler {
                 userInfo,
                 now
             );
-            // 5. 向新连接用户发送当前在线用户列表
+            // 5. Send current online users to the newly connected user
             sendOnlineUsersToNewUser(chatroomId, userId, userInfo, now);
         } catch (Exception e) {
             LOGGER.error("Error establishing WebSocket connection for user {} in chatroom {}", 
@@ -107,16 +107,15 @@ public class DistributedChatWebSocketHandler extends TextWebSocketHandler {
                    userId, chatroomId, status);
 
         try {
-            // 先清理本地会话，避免向已关闭的会话发送消息
+            // First, close the session if not already closed
             removeSession(chatroomId, userId);
             
-            // 获取用户信息
+            // Obtain user info from the registry
             UserDTO userInfo = chatSessionRegistryService.getUser(chatroomId, userId);
             
-            // 广播用户下线消息（只发给其他用户）
+            // Broadcast user offline message (to others only)
             if (userInfo != null) {
                 Date now = new Date();
-                // 使用异步方式广播，避免阻塞连接关闭过程
                 try {
                     broadcastMessage(
                         WebSocketConstants.MESSAGE_DISCONNECT,
@@ -145,7 +144,7 @@ public class DistributedChatWebSocketHandler extends TextWebSocketHandler {
         long userId = (long) session.getAttributes().get("userId");
         
         try {
-            // 从Redis获取用户信息（比从session属性获取更可靠）
+            // Obtain user info from the registry
             UserDTO userInfo = chatSessionRegistryService.getUser(chatroomId, userId);
             if (userInfo == null) {
                 LOGGER.warn("User {} not found in chatroom {} session registry", userId, chatroomId);
@@ -157,10 +156,10 @@ public class DistributedChatWebSocketHandler extends TextWebSocketHandler {
 
             LOGGER.debug("Received message from user {} in chatroom {}: {}", userId, chatroomId, messageContent);
 
-            // 1. 异步保存消息到消息服务
+            // 1. Save message asynchronously
             messagePersistenceService.saveMessageAsync(chatroomId, userInfo, messageContent, now);
 
-            // 2. 广播消息给所有用户
+            // 2. Broadcast message to all users in the chatroom
             broadcastMessage(
                 WebSocketConstants.MESSAGE_TEXT,
                 createFormattedMessage(WebSocketConstants.MESSAGE_TEXT, messageContent, userInfo, now),
@@ -181,7 +180,7 @@ public class DistributedChatWebSocketHandler extends TextWebSocketHandler {
         long userId = (long) session.getAttributes().get("userId");
         LOGGER.info("WebSocket transport error for user {} in chatroom {}: {}",
                    userId, chatroomId, exception.getStackTrace());
-        // 判断是否为常见的客户端断开错误
+        // Check if the error is due to client disconnection
         if (isClientDisconnectionError(exception)) {
             LOGGER.debug("WebSocket client disconnected for user {} in chatroom {}: {}", 
                         userId, chatroomId, exception.getMessage());
@@ -194,7 +193,7 @@ public class DistributedChatWebSocketHandler extends TextWebSocketHandler {
     }
     
     /**
-     * 判断是否为客户端断开导致的常见错误
+     * Check if the exception indicates a client disconnection
      */
     private boolean isClientDisconnectionError(Throwable exception) {
         if (exception == null) return false;
@@ -209,12 +208,12 @@ public class DistributedChatWebSocketHandler extends TextWebSocketHandler {
     }
 
     /**
-     * 处理聊天室成员变更事件广播
+     * Handle broadcasting member change messages (additions/removals)
      */
     public void broadcastMemberChangeMessage(long chatroomId, List<UserDTO> addedMembers, List<UserDTO> removedMembers) {
         Date now = new Date();
         
-        // 广播新成员加入消息
+        // Broadcast member addition messages
         for (UserDTO user : addedMembers) {
             broadcastMessage(
                 WebSocketConstants.MESSAGE_ADD_CHATROOM_MEMBER,
@@ -227,7 +226,7 @@ public class DistributedChatWebSocketHandler extends TextWebSocketHandler {
             );
         }
         
-        // 广播成员离开消息
+        // Broadcast member removal messages
         for (UserDTO user : removedMembers) {
             broadcastMessage(
                 WebSocketConstants.MESSAGE_REMOVE_CHATROOM_MEMBER,
@@ -242,7 +241,7 @@ public class DistributedChatWebSocketHandler extends TextWebSocketHandler {
     }
 
     /**
-     * 处理聊天室删除事件广播
+     * Handle broadcasting chatroom removal messages and cleanup
      */
     public void broadcastChatroomRemovalMessage(long chatroomId) {
         Date now = new Date();
@@ -256,19 +255,19 @@ public class DistributedChatWebSocketHandler extends TextWebSocketHandler {
             now
         );
         
-        // 关闭所有相关连接
+        // Clean up all local sessions
         Map<Long, WebSocketSession> sessions = localSessions.get(chatroomId);
         if (sessions != null) {
             sessions.values().forEach(this::closeSessionQuietly);
             localSessions.remove(chatroomId);
         }
         
-        // 取消订阅频道
+        // Unsubscribe from Redis channel
         unsubscribeFromChatroomChannel(chatroomId);
     }
 
     /**
-     * 广播消息的核心方法
+     * Broadcast a message to users in a chatroom, both locally and across instances if needed
      */
     private void broadcastMessage(int messageType, String message, long chatroomId, 
                                  String broadcastType, UserDTO sender, Date timestamp) {
@@ -281,7 +280,7 @@ public class DistributedChatWebSocketHandler extends TextWebSocketHandler {
 
         boolean allInLocalSessions = true;
         
-        // 1. 本地广播
+        // 1. Local broadcasting
         for (UserDTO user : onlineUsers) {
             Map<Long, WebSocketSession> localSessionsInChatroom = localSessions.get(chatroomId);
             if (localSessionsInChatroom != null && localSessionsInChatroom.containsKey(user.getId())) {
@@ -301,14 +300,14 @@ public class DistributedChatWebSocketHandler extends TextWebSocketHandler {
                 }
             } else {
                 allInLocalSessions = false;
-                // 如果当前实例在聊天室中没有任何本地连接，取消订阅
+                // If no local session, ensure we are subscribed to the Redis channel
                 if (localSessionsInChatroom == null || localSessionsInChatroom.isEmpty()) {
                     unsubscribeFromChatroomChannel(chatroomId);
                 }
             }
         }
 
-        // 2. 跨实例广播（如果有用户在其他实例且不是仅发给自己）
+        // 2. Distributed broadcasting via Redis if not all users are local
         if (!allInLocalSessions && !WebSocketConstants.TO_SELF_IN_CHATROOM.equals(broadcastType)) {
             String timestampStr = new SimpleDateFormat("HH:mm").format(timestamp);
             ChatBroadcastMessage broadcastMessage = chatMessageBroker.createBroadcastMessage(
@@ -319,7 +318,7 @@ public class DistributedChatWebSocketHandler extends TextWebSocketHandler {
     }
 
     /**
-     * 向新连接的用户发送当前在线用户列表
+     * Send the list of currently online users to the newly connected user
      */
     private void sendOnlineUsersToNewUser(long chatroomId, long newUserId, UserDTO newUser, Date now) {
         Set<UserDTO> onlineUsers = chatSessionRegistryService.getUserConnections(chatroomId);
@@ -340,7 +339,7 @@ public class DistributedChatWebSocketHandler extends TextWebSocketHandler {
     }
 
     /**
-     * 创建格式化的消息
+     * Create a formatted JSON message string
      */
     private String createFormattedMessage(int messageType, String messageContent, UserDTO userInfo, Date timestamp) {
         try {
@@ -456,13 +455,13 @@ public class DistributedChatWebSocketHandler extends TextWebSocketHandler {
     private void handleRedisMessage(ChatBroadcastMessage chatMessage, long chatroomId) {
         Map<Long, WebSocketSession> localSessionsInChatroom = localSessions.get(chatroomId);
         
-        // 如果当前实例没有该聊天室的连接，取消订阅
+        // If no local sessions, unsubscribe from channel
         if (localSessionsInChatroom == null || localSessionsInChatroom.isEmpty()) {
             unsubscribeFromChatroomChannel(chatroomId);
             return;
         }
 
-        // 避免处理自己发送的消息
+        // Avoid processing messages originating from this instance
         if (!chatMessageBroker.isFromCurrentInstance(chatMessage.instanceId())) {
             broadcastMessageLocally(
                 chatMessage.message(),

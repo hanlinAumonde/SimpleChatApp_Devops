@@ -27,16 +27,14 @@ public class ChatMessageBroker {
     public ChatMessageBroker(StringRedisTemplate redisTemplate) {
         this.redisTemplate = redisTemplate;
         this.objectMapper = new ObjectMapper();
-        // 生成唯一的实例ID，用于避免消息重复处理
         this.instanceId = generateInstanceId();
         LOGGER.info("ChatMessageBroker initialized with instance ID: {}", instanceId);
     }
 
     /**
-     * 生成实例ID
+     * Generate a unique instance ID for this broker instance
      */
     private String generateInstanceId() {
-        // 优先使用环境变量中的HOSTNAME或配置的instance-id
         String hostname = System.getenv("HOSTNAME");
         StringBuilder instanceId = new StringBuilder("websocket-");
         if (hostname != null && !hostname.isEmpty()) {
@@ -46,16 +44,16 @@ public class ChatMessageBroker {
     }
 
     /**
-     * 发送消息到聊天室频道
-     * @param chatroomId 聊天室ID
-     * @param message 广播消息
+     * Send a broadcast message to all subscribers of the specified chatroom channel.
+     * @param chatroomId chatroom ID
+     * @param message broadcast message
      */
     public void sendToChatroom(long chatroomId, ChatBroadcastMessage message) {
         try {
             String channel = String.format(CHATROOM_CHANNEL, chatroomId);
             String messageJson = objectMapper.writeValueAsString(message);
             
-            // 通过Redis pub/sub发布消息
+            // Publish the message to the Redis channel
             redisTemplate.convertAndSend(channel, messageJson);
             
             LOGGER.debug("Message sent to channel {}: messageType={}, broadcastType={}, instanceId={}", 
@@ -68,7 +66,7 @@ public class ChatMessageBroker {
     }
 
     /**
-     * 创建带有当前实例ID的广播消息
+     * Create a broadcast message object
      */
     public ChatBroadcastMessage createBroadcastMessage(int messageType, 
                                                       String broadcastType,
@@ -86,9 +84,9 @@ public class ChatMessageBroker {
     }
 
     /**
-     * 检查消息是否来自当前实例
-     * @param messageInstanceId 消息中的实例ID
-     * @return 是否为当前实例发送的消息
+     * Check if the message was sent by the current instance
+     * @param messageInstanceId Instance ID from the message
+     * @return true if the message is from the current instance, false otherwise
      */
     public boolean isFromCurrentInstance(String messageInstanceId) {
         return instanceId.equals(messageInstanceId);

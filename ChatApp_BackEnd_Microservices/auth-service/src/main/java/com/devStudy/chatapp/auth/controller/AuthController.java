@@ -44,7 +44,7 @@ public class AuthController {
 	private RabbitMQUtil rabbitMQUtil;
 	
 	/**
-	 * 检查用户登录状态
+	 * Check if user is logged in and return user info
 	 */
     @GetMapping("/check-login")
     public ResponseEntity<UserDTO> getLoggedUser(HttpServletRequest request){
@@ -65,7 +65,7 @@ public class AuthController {
     }
 
 	/**
-	 * 获取验证码
+	 * Obtain email verification code
 	 */
 	@GetMapping("/verification-code")
 	public ResponseEntity<Map<String,String>> getVerificationCode(@RequestParam String email) {
@@ -81,7 +81,7 @@ public class AuthController {
 	}
 
 	/**
-	 * 忘记密码
+	 * Send reset password email (with token link) to user
 	 */
 	@PostMapping(value = "/forget-password")
 	public ResponseEntity<Map<String, String>> postForgetPasswordPage(@RequestParam(value = "email") String email) {
@@ -89,7 +89,7 @@ public class AuthController {
 	}
 
 	/**
-	 * 验证重置密码token
+	 * Verify JWT token validity
 	 */
 	@GetMapping(value = "/validate-token")
 	public ResponseEntity<Boolean> validateToken(@RequestParam(value = "token") String token) {
@@ -97,7 +97,7 @@ public class AuthController {
 	}
 	
 	/**
-	 * 重置密码
+	 * Reset user password
 	 */
 	@PutMapping(value = "/reset-password")
 	public ResponseEntity<Boolean> resetPassword(@RequestParam(value = "token") String token,
@@ -106,7 +106,7 @@ public class AuthController {
 	}
 	
 	/**
-	 * 用户注册
+	 * User registration
 	 */
 	@PostMapping(value = "/register")
 	public ResponseEntity<CreateCompteDTO> createUserCompte(@RequestBody CreateCompteDTO createCompteDTO){
@@ -114,7 +114,7 @@ public class AuthController {
 	}
 
 	/**
-	 * 用户登出
+	 * User logout
 	 */
 	@PostMapping(value = "/logout")
 	public ResponseEntity<?> logout(HttpServletRequest request){
@@ -133,7 +133,7 @@ public class AuthController {
 	}
 
 	/**
-	 * 通过邮箱获取用户信息（供网关使用）
+	 * Get user info by email, called by api-gateway
 	 */
 	@GetMapping("/user-info")
 	public ResponseEntity<UserDTO> getUserInfo(@RequestParam String email) {

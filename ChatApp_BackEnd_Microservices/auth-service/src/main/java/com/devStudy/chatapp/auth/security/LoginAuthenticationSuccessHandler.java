@@ -26,9 +26,12 @@ public class LoginAuthenticationSuccessHandler implements AuthenticationSuccessH
     private static final ObjectMapper mapper = new ObjectMapper();
 
 	private final JwtTokenService jwtTokenService;
+    private final String JWT_TOKEN_COOKIE_NAME;
 
-	public LoginAuthenticationSuccessHandler(JwtTokenService jwtTokenService) {
-		this.jwtTokenService = jwtTokenService;
+	public LoginAuthenticationSuccessHandler(
+            JwtTokenService jwtTokenService, String jwtTokenCookieName) {
+		this.JWT_TOKEN_COOKIE_NAME = jwtTokenCookieName;
+        this.jwtTokenService = jwtTokenService;
 	}
 
     @Override
@@ -49,7 +52,7 @@ public class LoginAuthenticationSuccessHandler implements AuthenticationSuccessH
 		result.put("isAuthenticated", true);
 
 		// Store JWT token in cookie
-		Cookie cookie = new Cookie("JWT-Token", jwtToken);
+		Cookie cookie = new Cookie(JWT_TOKEN_COOKIE_NAME, jwtToken);
 		cookie.setHttpOnly(true);
 		cookie.setPath("/");
 		cookie.setMaxAge(86400); // 1 day

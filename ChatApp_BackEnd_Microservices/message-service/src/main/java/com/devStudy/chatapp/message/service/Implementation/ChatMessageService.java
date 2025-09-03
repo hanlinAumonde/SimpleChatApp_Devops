@@ -43,13 +43,18 @@ public class ChatMessageService implements IChatMessageService {
     }
 
     @Override
-    public void saveMsgIntoCollection(long chatroomId, UserDTO sender, String content, Date timestamp) {
-        ChatMessage chatMessage = new ChatMessage();
-        chatMessage.setChatroomId(chatroomId);
-        chatMessage.setUser(sender);
-        chatMessage.setContent(content);
-        chatMessage.setTimestamp(timestamp);
-        chatMessageRepository.insert(chatMessage);
+    public boolean saveMsgIntoCollection(long chatroomId, UserDTO sender, String content, Date timestamp) {
+        try{
+            ChatMessage chatMessage = new ChatMessage();
+            chatMessage.setChatroomId(chatroomId);
+            chatMessage.setUser(sender);
+            chatMessage.setContent(content);
+            chatMessage.setTimestamp(timestamp);
+            chatMessageRepository.insert(chatMessage);
+            return true;
+        }catch(Exception e){
+            return false;
+        }
     }
 
     @Override
@@ -111,7 +116,6 @@ public class ChatMessageService implements IChatMessageService {
         msgDTO.setMessage(msg.getContent());
         msgDTO.setTimestamp(ContentTimeStampFormat.format(msg.getTimestamp()));
         
-        // 设置是否是当前用户发送的消息
         if (currentUserId != null) {
             msgDTO.setSentByUser(msg.getUser().getId() == currentUserId);
         } else {

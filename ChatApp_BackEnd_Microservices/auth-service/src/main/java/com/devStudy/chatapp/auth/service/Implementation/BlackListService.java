@@ -1,17 +1,19 @@
 package com.devStudy.chatapp.auth.service.Implementation;
 
 import com.devStudy.chatapp.auth.service.Interface.IBlackListService;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.concurrent.TimeUnit;
 
-import static com.devStudy.chatapp.auth.utils.ConstantValues.BLACKLIST_PREFIX;
-
 @Service
 public class BlackListService implements IBlackListService {
 
     private final RedisTemplate<String, Object> redisTemplate;
+
+    @Value("${chatroomApp.redis.BLACKLIST_PREFIX}")
+    private String BLACKLIST_PREFIX;
 
     public BlackListService(RedisTemplate<String, Object> redisTemplate) {
         this.redisTemplate = redisTemplate;

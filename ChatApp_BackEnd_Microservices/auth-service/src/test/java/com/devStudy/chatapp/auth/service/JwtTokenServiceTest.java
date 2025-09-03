@@ -13,7 +13,6 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.Date;
 
-import static com.devStudy.chatapp.auth.utils.ConstantValues.JWT_TOKEN_COOKIE_NAME;
 import static com.devStudy.chatapp.auth.utils.ConstantValues.TOKEN_FLAG_LOGIN;
 import static com.devStudy.chatapp.auth.utils.ConstantValues.TOKEN_FLAG_RESET_PASSWORD;
 import static org.junit.jupiter.api.Assertions.*;
@@ -28,15 +27,17 @@ class JwtTokenServiceTest {
     @InjectMocks
     private JwtTokenService jwtTokenService;
 
-    private static final String TEST_SECRET_KEY = "dGVzdC1zZWNyZXQta2V5LWZvci1qd3QtdG9rZW4tdGVzdGluZy1wdXJwb3Nlcy1vbmx5LWRvLW5vdC11c2UtaW4tcHJvZHVjdGlvbg==";
-    private static final Long LOGIN_TOKEN_EXPIRATION = 60L; // 60 minutes
-    private static final Long RESET_PWD_TOKEN_EXPIRATION = 15L; // 15 minutes
+    private static final String TEST_SECRET_KEY = "404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970";
+    private static final Long LOGIN_TOKEN_EXPIRATION = 1440L; // 24*60 minutes
+    private static final Long RESET_PWD_TOKEN_EXPIRATION = 10L; // 10 minutes
+    private static final String JWT_TOKEN_COOKIE_NAME = "JWT-Token";
 
     @BeforeEach
     void setUp() {
         ReflectionTestUtils.setField(jwtTokenService, "secretKey", TEST_SECRET_KEY);
         ReflectionTestUtils.setField(jwtTokenService, "loginTokenExpirationTime", LOGIN_TOKEN_EXPIRATION);
         ReflectionTestUtils.setField(jwtTokenService, "resetPwdTokenExpirationTime", RESET_PWD_TOKEN_EXPIRATION);
+        ReflectionTestUtils.setField(jwtTokenService, "JWT_TOKEN_COOKIE_NAME", "JWT-Token");
     }
 
     @Test
@@ -75,6 +76,11 @@ class JwtTokenServiceTest {
         boolean isValid = jwtTokenService.validateToken(token);
         
         assertTrue(isValid);
+
+        String token2 = jwtTokenService.generateJwtToken(email, TOKEN_FLAG_RESET_PASSWORD);
+        boolean isValid2 = jwtTokenService.validateToken(token2);
+
+        assertTrue(isValid2);
     }
 
     @Test

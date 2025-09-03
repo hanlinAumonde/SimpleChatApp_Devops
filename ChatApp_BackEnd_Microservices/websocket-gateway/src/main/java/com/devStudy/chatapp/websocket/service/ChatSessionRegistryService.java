@@ -19,7 +19,7 @@ public class ChatSessionRegistryService {
     private final RedisTemplate<String, Object> redisTemplate;
 
     @Value("${websocket.chat.session-expiry:86400}")
-    private long chatSessionExpiry; // 24小时
+    private long chatSessionExpiry;
 
     @Value("${websocket.chat.redis.chatroom-users-key}")
     private String CHATROOM_USERS_KEY;
@@ -30,17 +30,17 @@ public class ChatSessionRegistryService {
     }
 
     /**
-     * 构建用户在聊天室中的Redis key
-     * 格式: chatroom:{chatroomId}:user:{userId}
+     * Build the Redis key for a user's connection in a chatroom.
+     * Format: chatroom:{chatroomId}:user:{userId}
      */
     private String buildUserKey(long chatroomId, long userId) {
         return String.format(CHATROOM_USERS_KEY, chatroomId, userId);
     }
 
     /**
-     * 注册用户连接到聊天室
-     * @param chatroomId 聊天室ID
-     * @param userInfo 用户信息
+     * Inscribe a user connection to a chatroom with an expiry time.
+     * @param chatroomId chatroom ID
+     * @param userInfo user information
      */
     public void registerUserConnection(long chatroomId, UserDTO userInfo) {
         try {
@@ -55,10 +55,10 @@ public class ChatSessionRegistryService {
     }
 
     /**
-     * 移除用户连接并返回剩余用户数量
-     * @param chatroomId 聊天室ID
-     * @param userId 用户ID
-     * @return 移除后聊天室中的用户数量
+     * Remove a user connection from a chatroom.
+     * @param chatroomId chatroom ID
+     * @param userId user ID
+     * @return number of remaining users in the chatroom after removal
      */
     public long removeUserConnection(long chatroomId, long userId) {
         try {
@@ -71,14 +71,14 @@ public class ChatSessionRegistryService {
         } catch (Exception e) {
             LOGGER.error("Failed to remove user connection for user {} in chatroom {}", 
                         userId, chatroomId, e);
-            return getUserCount(chatroomId); // 返回当前用户数，即使删除失败
+            return getUserCount(chatroomId); // return current count even on failure
         }
     }
 
     /**
-     * 获取聊天室中的用户数量
-     * @param chatroomId 聊天室ID
-     * @return 用户数量
+     * Obtain the number of users currently in a chatroom.
+     * @param chatroomId chatroom ID
+     * @return user count
      */
     public long getUserCount(long chatroomId) {
         try {
@@ -92,9 +92,9 @@ public class ChatSessionRegistryService {
     }
 
     /**
-     * 获取聊天室中的所有用户连接
-     * @param chatroomId 聊天室ID
-     * @return 用户信息集合
+     * Obtain all user connections in a chatroom.
+     * @param chatroomId chatroom ID
+     * @return collection of user information
      */
     public Set<UserDTO> getUserConnections(long chatroomId) {
         try {
@@ -123,15 +123,15 @@ public class ChatSessionRegistryService {
             
         } catch (Exception e) {
             LOGGER.error("Failed to get user connections for chatroom {}", chatroomId, e);
-            return Set.of(); // 返回空集合而不是抛出异常
+            return Set.of(); // return empty set on failure
         }
     }
 
     /**
-     * 获取特定用户在聊天室中的信息
-     * @param chatroomId 聊天室ID
-     * @param userId 用户ID
-     * @return 用户信息，如果不存在则返回null
+     * Obtain a specific user's information in a chatroom.
+     * @param chatroomId chatroom ID
+     * @param userId user ID
+     * @return user information or null if not found
      */
     public UserDTO getUser(long chatroomId, long userId) {
         try {

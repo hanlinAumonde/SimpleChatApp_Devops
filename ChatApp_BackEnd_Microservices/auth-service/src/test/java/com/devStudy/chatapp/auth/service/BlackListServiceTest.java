@@ -9,10 +9,10 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.concurrent.TimeUnit;
 
-import static com.devStudy.chatapp.auth.utils.ConstantValues.BLACKLIST_PREFIX;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
@@ -30,11 +30,12 @@ class BlackListServiceTest {
     private BlackListService blackListService;
 
     private static final String TEST_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.test";
+    private static final String BLACKLIST_PREFIX = "token:blacklist:";
     private static final String BLACKLIST_KEY = BLACKLIST_PREFIX + TEST_TOKEN;
 
     @BeforeEach
-    void setUp() {
-        // setUp方法保持简单，避免不必要的stubbing
+    void setup(){
+        ReflectionTestUtils.setField(blackListService, "BLACKLIST_PREFIX", BLACKLIST_PREFIX);
     }
 
     @Test
@@ -68,8 +69,7 @@ class BlackListServiceTest {
 
     @Test
     void testAddTokenToBlackList_ZeroTTL_NoAction() {
-        long currentTime = System.currentTimeMillis();
-        long expirationTime = currentTime; // 当前时间，TTL为0
+        long expirationTime = System.currentTimeMillis(); // 当前时间，TTL为0
 
         blackListService.addTokenToBlackList(TEST_TOKEN, expirationTime);
 
@@ -147,7 +147,6 @@ class BlackListServiceTest {
         long currentTime = System.currentTimeMillis();
         long expirationTime = currentTime + 3600000;
 
-        // 测试null token
         blackListService.addTokenToBlackList(null, expirationTime);
 
         verify(valueOperations).set(

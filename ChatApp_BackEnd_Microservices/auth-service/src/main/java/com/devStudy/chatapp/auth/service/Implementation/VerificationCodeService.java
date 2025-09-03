@@ -12,9 +12,6 @@ import org.springframework.stereotype.Service;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
-import static com.devStudy.chatapp.auth.utils.ConstantValues.ATTEMPTS_PREFIX;
-import static com.devStudy.chatapp.auth.utils.ConstantValues.CODE_PREFIX;
-
 @Service
 public class VerificationCodeService implements IVerificationCodeService {
     private static final Logger logger = LoggerFactory.getLogger(VerificationCodeService.class);
@@ -24,6 +21,12 @@ public class VerificationCodeService implements IVerificationCodeService {
 
     @Value("${chatroomApp.redis.expirationTime}")
     private int expirationTime;
+
+    @Value("${chatroomApp.redis.ATTEMPTS_PREFIX}")
+    private String ATTEMPTS_PREFIX;
+
+    @Value("${chatroomApp.redis.CODE_PREFIX}")
+    private String CODE_PREFIX;
 
     @Autowired
     VerificationCodeService(EmailService emailService, RedisTemplate<String, Object> redisTemplate) {

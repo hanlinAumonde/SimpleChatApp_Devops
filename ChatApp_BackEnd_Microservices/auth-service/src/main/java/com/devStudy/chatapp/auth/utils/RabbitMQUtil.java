@@ -29,6 +29,15 @@ public class RabbitMQUtil {
     @Value("${chatroomApp.FrontEndURL:http://localhost:4200}")
     private String FrontEndURL;
 
+    @Value("${chatroomApp.rabbitmq.RABBITMQ_EXCHANGE_NAME}")
+    private String RABBITMQ_EXCHANGE_NAME;
+
+    @Value("${chatroomApp.rabbitmq.ROUTING_KEY_RET_PASSWORD}")
+    private String ROUTING_KEY_RET_PASSWORD;
+
+    @Value("${chatroomApp.rabbitmq.ROUTING_KEY_VERIFICATION_CODE}")
+    private String ROUTING_KEY_VERIFICATION_CODE;
+
     private final RabbitTemplate rabbitTemplate;
     private final UserService userService;
     private final EmailService emailService;
@@ -37,10 +46,11 @@ public class RabbitMQUtil {
 
     @Autowired
     public RabbitMQUtil(RabbitTemplate rabbitTemplate, 
-                       UserService userService, 
-                       EmailService emailService, 
-                       JwtTokenService tokenService, 
-                       VerificationCodeService verificationCodeService) {
+                        UserService userService,
+                        EmailService emailService,
+                        JwtTokenService tokenService,
+                        VerificationCodeService verificationCodeService
+    ) {
         this.rabbitTemplate = rabbitTemplate;
         this.userService = userService;
         this.emailService = emailService;
@@ -75,7 +85,7 @@ public class RabbitMQUtil {
         return "Le code de vérification a été envoyé à votre adresse email, si vous n'avez pas reçu l'email, veuillez réessayer dans 60 secondes";
     }
 
-    @RabbitListener(queues = RABBITMQ_QUEUE_Q1, concurrency = "1-3")
+    @RabbitListener(queues = "${chatroomApp.rabbitmq.RABBITMQ_QUEUE_Q1}", concurrency = "1-3")
     public void sendResetPasswordEmail(String email) {
         try {
             Optional<User> user = userService.findUserOrAdmin(email, false);
@@ -103,7 +113,7 @@ public class RabbitMQUtil {
         }
     }
 
-    @RabbitListener(queues = RABBITMQ_QUEUE_Q2, concurrency = "1-5")
+    @RabbitListener(queues = "${chatroomApp.rabbitmq.RABBITMQ_QUEUE_Q2}", concurrency = "1-5")
     public void sendVerificationCodeEmail(String email) {
         verificationCodeService.sendCode(email);
     }

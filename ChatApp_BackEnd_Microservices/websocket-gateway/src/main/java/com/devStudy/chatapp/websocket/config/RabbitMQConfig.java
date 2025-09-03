@@ -11,10 +11,10 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class RabbitMQConfig {
 
-    // 交换机名称（与crud-service保持一致）
+    // Name of the exchange
     public static final String EXCHANGE_NAME = "chatroom-event-exchange";
     
-    // 队列名称
+    // Name of the queues
     public static final String WEBSOCKET_CHATROOM_MEMBER_CHANGE_QUEUE = "websocket.chatroom.member.change";
     public static final String WEBSOCKET_CHATROOM_REMOVE_QUEUE = "websocket.chatroom.remove";
     
@@ -23,7 +23,7 @@ public class RabbitMQConfig {
     public static final String CHATROOM_REMOVE_ROUTING_KEY = "chatroom.remove";
 
     /**
-     * 声明聊天室事件交换机
+     * Declare a topic exchange for chatroom events
      */
     @Bean
     public TopicExchange chatroomEventsExchange() {
@@ -31,7 +31,7 @@ public class RabbitMQConfig {
     }
 
     /**
-     * 声明WebSocket聊天室成员变更队列
+     * Declare WebSocket chatroom member change queue
      */
     @Bean
     public Queue websocketChatroomMemberChangeQueue() {
@@ -39,7 +39,7 @@ public class RabbitMQConfig {
     }
 
     /**
-     * 声明WebSocket聊天室删除队列
+     * Declare WebSocket chatroom remove queue
      */
     @Bean
     public Queue websocketChatroomRemoveQueue() {
@@ -47,7 +47,7 @@ public class RabbitMQConfig {
     }
 
     /**
-     * 绑定成员变更队列到交换机
+     * Binding chatroom member change queue to exchange
      */
     @Bean
     public Binding websocketChatroomMemberChangeBinding() {
@@ -58,7 +58,7 @@ public class RabbitMQConfig {
     }
 
     /**
-     * 绑定聊天室删除队列到交换机
+     * Binding chatroom remove queue to exchange
      */
     @Bean
     public Binding websocketChatroomRemoveBinding() {
@@ -69,7 +69,7 @@ public class RabbitMQConfig {
     }
 
     /**
-     * JSON消息转换器
+     * JSON message converter for RabbitMQ
      */
     @Bean
     public Jackson2JsonMessageConverter messageConverter() {
@@ -77,7 +77,7 @@ public class RabbitMQConfig {
     }
 
     /**
-     * 配置RabbitTemplate
+     * Configuration of RabbitTemplate
      */
     @Bean
     public RabbitTemplate rabbitTemplate(ConnectionFactory connectionFactory) {
@@ -87,7 +87,7 @@ public class RabbitMQConfig {
     }
 
     /**
-     * 配置监听器容器工厂
+     * Configuration of RabbitListenerContainerFactory
      */
     @Bean
     public SimpleRabbitListenerContainerFactory rabbitListenerContainerFactory(ConnectionFactory connectionFactory) {

@@ -2,9 +2,6 @@ package com.devStudy.chatapp.message.dto;
 
 import java.util.Date;
 
-/**
- * 消息保存请求DTO
- */
 public class SaveMessageRequest {
     private long senderId;
     private String senderFirstName;

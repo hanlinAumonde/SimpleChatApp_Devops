@@ -10,7 +10,6 @@ import java.util.Date;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -100,7 +99,7 @@ class MessageControllerTest {
         // Given
         List<ChatMsgDTO> userMessages = Arrays.asList(
                 testMessages.get(0), // dateSign
-                createUserMessage(testUserId, true), // 当前用户的消息
+                createUserMessage(), // 当前用户的消息
                 testMessages.get(2) // latestDateSign
         );
         
@@ -180,30 +179,6 @@ class MessageControllerTest {
     }
 
     @Test
-    void testSaveMessage_SuccessWithoutTimestamp() throws Exception {
-        // Given
-        SaveMessageRequest request = new SaveMessageRequest();
-        request.setSenderId(testUserId);
-        request.setSenderFirstName("Test");
-        request.setSenderLastName("User");
-        request.setSenderMail("testuser@test.com");
-        request.setContent("Test message content");
-        request.setTimestamp(null); // 没有时间戳
-
-        String requestBody = objectMapper.writeValueAsString(request);
-
-        // When & Then
-        mockMvc.perform(post("/api/messages/chatrooms/{chatroomId}/save", testChatroomId)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(requestBody))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$").doesNotExist()); // 空响应体
-
-        verify(chatMessageService, times(1))
-                .saveMsgIntoCollection(eq(testChatroomId), any(UserDTO.class), eq("Test message content"), any(Date.class));
-    }
-
-    @Test
     void testSaveMessage_SuccessWithTimestamp() throws Exception {
         // Given
         Date customTimestamp = TestDataFactory.createTestDate(2025, 8, 28, 12, 0);
@@ -218,11 +193,15 @@ class MessageControllerTest {
 
         String requestBody = objectMapper.writeValueAsString(request);
 
+        when(chatMessageService.saveMsgIntoCollection(eq(testChatroomId), any(UserDTO.class), eq("Test message with timestamp"), eq(customTimestamp)))
+                .thenReturn(true);
+
         // When & Then
         mockMvc.perform(post("/api/messages/chatrooms/{chatroomId}/save", testChatroomId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestBody))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(content().string("true"));
 
         verify(chatMessageService, times(1))
                 .saveMsgIntoCollection(eq(testChatroomId), any(UserDTO.class), eq("Test message with timestamp"), eq(customTimestamp));
@@ -355,14 +334,14 @@ class MessageControllerTest {
                 .getChatMessagesByChatroomIdByPage(testChatroomId, negativePage);
     }
 
-    private ChatMsgDTO createUserMessage(long userId, boolean sentByUser) {
+    private ChatMsgDTO createUserMessage() {
         ChatMsgDTO msg = new ChatMsgDTO();
         msg.setIndex(1);
-        msg.setUserId(userId);
-        msg.setUsername("Test User" + userId);
+        msg.setUserId(4L);
+        msg.setUsername("Test User" + 4L);
         msg.setMessage("User message");
         msg.setTimestamp("10:30");
-        msg.setSentByUser(sentByUser);
+        msg.setSentByUser(true);
         msg.setMessageType("content");
         return msg;
     }

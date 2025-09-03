@@ -2,7 +2,6 @@ spring:
   application:
     name: websocket-gateway
     
-  # Redis配置
   data:
     redis:
       host: ${REDIS_HOST:localhost}
@@ -15,7 +14,6 @@ spring:
           max-idle: 8
           min-idle: 0
       
-  # RabbitMQ配置
   rabbitmq:
     host: ${RABBITMQ_HOST:localhost}
     port: ${RABBITMQ_PORT:5672}
@@ -24,6 +22,8 @@ spring:
 
   cloud:
     openfeign:
+      circuitbreaker:
+        enabled: true
       client:
         config:
           default:
@@ -39,27 +39,27 @@ spring:
           message-service:
             connect-timeout: 5000
             read-timeout: 10000
-      # 启用HTTP/2
       httpclient:
         enabled: true
 
-# 服务器配置
 server:
   port: ${SERVER_PORT:8086}
   servlet:
     context-path: /
 
-# WebSocket配置
 websocket:
   chat:
     endpoint: /ws/chatroom/{chatroomId}/user/{userId}
     allowed-origins: ${FRONT_URL:http://localhost:4200}
-    session-expiry: 86400  # 24小时（秒）
+    session-expiry: 86400  # 24 hours in seconds
     redis:
-      chatroom-channel: "channel:chatroom:%d"
+      chatroom-channel: channel:chatroom:%d
       chatroom-users-key: chatroom:%d:user:%d
+  message:
+    MAX_RETRY_ATTEMPTS: 3
+    INITIAL_RETRY_DELAY_MS: 1000
+    RETRY_BACKOFF_MULTIPLIER: 2.0
 
-# Eureka配置
 eureka:
   client:
     service-url:
@@ -72,7 +72,6 @@ eureka:
     lease-renewal-interval-in-seconds: 30
     lease-expiration-duration-in-seconds: 90
 
-# 日志配置
 logging:
   level:
     com.devStudy.chatapp.websocket: INFO
@@ -84,14 +83,42 @@ logging:
     console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
     file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
 
+resilience4j:
+  circuitbreaker:
+    instances:
+      message-service:
+        failureRateThreshold: 50
+        minimumNumberOfCalls: 5
+        permittedNumberOfCallsInHalfOpenState: 3
+        waitDurationInOpenState: 30s
+        slidingWindowSize: 10
+        slidingWindowType: COUNT_BASED
+  retry:
+    instances:
+      message-service:
+        maxAttempts: 3
+        waitDuration: 1s
+        exponentialBackoffMultiplier: 2
+        retryExceptions:
+          - feign.FeignException.InternalServerError
+          - feign.FeignException.ServiceUnavailable
+          - java.net.ConnectException
+          - java.net.SocketTimeoutException
+  timelimiter:
+    instances:
+      message-service:
+        timeoutDuration: 5s
+
 management:
   endpoints:
     web:
       exposure:
-        include: health,info,metrics
+        include: health,info,metrics,circuitbreakers,retries
   endpoint:
     health:
       show-details: when-authorized
+    circuitbreakers:
+      enabled: true
   info:
     env:
       enabled: true

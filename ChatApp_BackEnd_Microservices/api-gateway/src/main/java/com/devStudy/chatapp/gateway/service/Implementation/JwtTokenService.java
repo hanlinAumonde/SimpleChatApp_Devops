@@ -21,8 +21,9 @@ import java.util.function.Supplier;
 @Service
 public class JwtTokenService implements IJwtTokenService {
     private static final Logger LOGGER = LoggerFactory.getLogger(JwtTokenService.class);
-    
-    private static final String JWT_TOKEN_COOKIE_NAME = "JWT-Token";
+
+    @Value("${chatroomApp.JWT_TOKEN_COOKIE_NAME}")
+    private String JWT_TOKEN_COOKIE_NAME;
     
     @Value("${chatroomApp.jwt.secret}")
     private String secretKey;
@@ -33,7 +34,7 @@ public class JwtTokenService implements IJwtTokenService {
     }
 
     /**
-     * 验证令牌并获取邮箱
+     * Check if the token is valid and not expired, then extract the email (subject)
      */
     @Override
     public String validateTokenAndGetEmail(String token) {
@@ -44,7 +45,7 @@ public class JwtTokenService implements IJwtTokenService {
     }
 
     /**
-     * 获取令牌过期时间
+     * Obtain the expiration date from the token
      */
     @Override
     public Date getExpirationDate(String token) {
@@ -55,7 +56,7 @@ public class JwtTokenService implements IJwtTokenService {
     }
 
     /**
-     * 从请求Cookie中获取JWT令牌
+     * Obtain the JWT token from the request cookies
      */
     @Override
     public String getTokenFromRequest(ServerWebExchange exchange) {
@@ -66,7 +67,7 @@ public class JwtTokenService implements IJwtTokenService {
     }
 
     /**
-     * 统一的异常处理方法
+     * Exception handling wrapper
      */
     private <T> T executeWithExceptionHandling(Supplier<T> operation, String errorMessage) {
         try {
@@ -90,7 +91,7 @@ public class JwtTokenService implements IJwtTokenService {
     }
 
     /**
-     * 从令牌中获取Claims
+     * Obtain Claims from the token using the provided resolver function
      */
     private <T> T getClaimFromToken(String token, Function<Claims, T> claimsResolver) {
         final Claims claims = Jwts.parser()

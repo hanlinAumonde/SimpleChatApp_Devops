@@ -21,7 +21,6 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 import javax.crypto.SecretKey;
 
-import static com.devStudy.chatapp.auth.utils.ConstantValues.JWT_TOKEN_COOKIE_NAME;
 import static com.devStudy.chatapp.auth.utils.ConstantValues.TOKEN_FLAG_LOGIN;
 
 @Service
@@ -36,6 +35,9 @@ public class JwtTokenService implements IJwtTokenService {
 
 	@Value("${chatroomApp.jwt.loginTokenExpirationTime}")
 	private Long loginTokenExpirationTime;
+
+    @Value("${chatroomApp.jwt.JWT_TOKEN_COOKIE_NAME}")
+    private String JWT_TOKEN_COOKIE_NAME;
     
     private SecretKey getSecretKey() {
     	byte[] keyBytes = Decoders.BASE64.decode(secretKey);
@@ -58,7 +60,7 @@ public class JwtTokenService implements IJwtTokenService {
 	}
 
     /**
-     * 验证令牌是否有效
+     * Check if the token is valid (not expired and correctly signed)
      */
     @Override
     public boolean validateToken(String token) {
@@ -70,7 +72,7 @@ public class JwtTokenService implements IJwtTokenService {
     }
 
     /**
-     * 验证令牌并获取邮箱
+     * Check if the token is valid and return the email if valid, otherwise return null
      */
     @Override
     public String validateTokenAndGetEmail(String token) {
@@ -82,7 +84,7 @@ public class JwtTokenService implements IJwtTokenService {
     }
 
     /**
-     * 获取令牌过期时间
+     * Obtain the expiration date from the token
      */
     @Override
     public Date getExpirationDate(String token) {
@@ -94,7 +96,7 @@ public class JwtTokenService implements IJwtTokenService {
     }
 
     /**
-     * 从Cookie中获取JWT令牌
+     * Obtain the token from cookies in the request
      */
     @Override
     public String getTokenFromCookie(HttpServletRequest request) {
@@ -110,7 +112,7 @@ public class JwtTokenService implements IJwtTokenService {
     }
 
     /**
-     * 统一的异常处理方法
+     * Excption handling wrapper for JWT operations
      */
     private <T> T executeWithExceptionHandling(Supplier<T> operation, String errorMessage, T defaultValue) {
         try {
@@ -134,7 +136,7 @@ public class JwtTokenService implements IJwtTokenService {
     }
 
     /**
-     * 从令牌中获取Claims
+     * Obtain Claims from the token using the provided claims resolver function
      */
     private <T> T getClaimFromToken(String token, Function<Claims, T> claimsResolver) {
         final Claims claims = Jwts.parser()

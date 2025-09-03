@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory;
 import org.springframework.core.io.buffer.DataBuffer;
@@ -32,6 +33,18 @@ public class AuthenticationGatewayFilter extends AbstractGatewayFilterFactory<Au
     private final UserService userService;
     private final ObjectMapper objectMapper;
 
+    @Value("${chatroomApp.request.header.UserID}")
+    private String UserIDHeader;
+
+    @Value("${chatroomApp.request.header.UserEmail}")
+    private String UserEmailHeader;
+
+    @Value("${chatroomApp.request.header.UserFirstName}")
+    private String UserFirstNameHeader;
+
+    @Value("${chatroomApp.request.header.UserLastName}")
+    private String UserLastNameHeader;
+
     @Autowired
     public AuthenticationGatewayFilter(JwtTokenService jwtTokenService,
                                      RedisBlackListService blackListService,
@@ -53,17 +66,17 @@ public class AuthenticationGatewayFilter extends AbstractGatewayFilterFactory<Au
                 return handleUnauthorized(exchange, "JWT token not found");
             }
 
-            // 验证token是否在黑名单中
+            // Check if token is blacklisted
             return blackListService.isTokenInBlackList(token)
                     .flatMap(isBlacklisted -> {
                         if (isBlacklisted) {
                             return handleUnauthorized(exchange, "JWT token is blacklisted");
                         }
                         
-                        // 验证token并获取邮箱
+                        // Check token validity and extract email
                         String email = jwtTokenService.validateTokenAndGetEmail(token);
                         if (email == null) {
-                            // Token无效，加入黑名单
+                            // Invalid token, add to blacklist
                             return blackListService.addTokenToBlackList(token, 
                                     jwtTokenService.getExpirationDate(token) != null ? 
                                     jwtTokenService.getExpirationDate(token).getTime() : 
@@ -71,23 +84,23 @@ public class AuthenticationGatewayFilter extends AbstractGatewayFilterFactory<Au
                                     .then(handleUnauthorized(exchange, "Invalid JWT token"));
                         }
 
-                        // 获取用户信息并添加到请求头
+                        // Obtain user info from user service
                         return userService.getUserByEmail(email)
                                 .flatMap(userInfo -> {
                                     if (userInfo.getId() == null) {
-                                        // 用户不存在，将token加入黑名单
+                                        // User not found, add token to blacklist
                                         return blackListService.addTokenToBlackList(token,
                                                 jwtTokenService.getExpirationDate(token).getTime())
                                                 .then(handleUnauthorized(exchange, "User not found"));
                                     }
 
-                                    // 添加用户信息到请求头
+                                    // Add user info to headers
                                     ServerHttpRequest modifiedRequest = exchange.getRequest()
                                             .mutate()
-                                            .header("X-User-Id", userInfo.getId().toString())
-                                            .header("X-User-Email", userInfo.getMail())
-                                            .header("X-User-FirstName", userInfo.getFirstName())
-                                            .header("X-User-LastName", userInfo.getLastName())
+                                            .header(UserIDHeader, userInfo.getId().toString())
+                                            .header(UserEmailHeader, userInfo.getMail())
+                                            .header(UserFirstNameHeader, userInfo.getFirstName())
+                                            .header(UserLastNameHeader, userInfo.getLastName())
                                             .build();
 
                                     ServerWebExchange modifiedExchange = exchange.mutate()
@@ -123,7 +136,5 @@ public class AuthenticationGatewayFilter extends AbstractGatewayFilterFactory<Au
         }
     }
 
-    public static class Config {
-        // 配置类，暂时为空
-    }
+    public static class Config {}
 }

@@ -38,7 +38,6 @@ spring:
     username: ${RABBITMQ_USERNAME:admin}
     password: ${RABBITMQ_PASSWORD:admin}
     
-  # 邮件配置
   mail:
     host: smtp.your-email-provider.com
     port: 587
@@ -57,22 +56,29 @@ eureka:
       defaultZone: ${EUREKA_SERVER_URL:http://localhost:8761/eureka}
   instance:
     prefer-ip-address: true
-    hostname: auth-service
+    hostname: ${HOSTNAME:auth-service}
 
-# JWT配置
 chatroomApp:
   FrontEndURL: ${FRONT_URL:http://localhost:4200}
   jwt:
     secret: 404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970
-    loginTokenExpirationTime: 1440  # 24小时(分钟)
-    resetPwdTokenExpirationTime: 10  # 10分钟
+    loginTokenExpirationTime: 1440  # 24 hours
+    resetPwdTokenExpirationTime: 10  # 10 minutes
+    JWT_TOKEN_COOKIE_NAME: JWT-Token
   rememberMe:
     key: myRememberMeKey
-    expirationTime: 86400  # 24小时(秒)
-  pageable:
-    DefaultPageSize_Users: 5
+    expirationTime: 86400  # 24 hours
   redis:
-    expirationTime: 300  # Redis缓存过期时间(秒)
+    expirationTime: 300
+    BLACKLIST_PREFIX: "token:blacklist:"
+    ATTEMPTS_PREFIX: "verification:attempts:"
+    CODE_PREFIX: "verification:code:"
+  rabbitmq:
+    RABBITMQ_EXCHANGE_NAME: topics-exchange
+    RABBITMQ_QUEUE_Q1: sendMail-queue-q1
+    RABBITMQ_QUEUE_Q2: sendMail-queue-q2
+    ROUTING_KEY_RET_PASSWORD: mail.resetPassword
+    ROUTING_KEY_VERIFICATION_CODE: mail.verificationCode
   VERIFICATION_CODE_LOGIN_ENDPOINT: /api/auth/login-verification-code
   MAX_FAILED_ATTEMPTS: 3
 

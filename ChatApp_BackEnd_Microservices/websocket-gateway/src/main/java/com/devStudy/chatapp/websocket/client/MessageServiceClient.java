@@ -7,18 +7,20 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 /**
- * 消息服务客户端
- * 用于异步保存聊天消息到MongoDB
+ * Message Service Client
+ * Save message into mongoDB using message-service microservice
+ * Use spring cloud integration of resilience4j for fallback
  */
-@FeignClient(name = "message-service")
+@FeignClient(name = "message-service", fallback = MessageServiceClientFallBack.class)
 public interface MessageServiceClient {
     
     /**
-     * 保存聊天消息
-     * @param chatroomId 聊天室ID
-     * @param request 消息保存请求
+     * Save message
+     * @param chatroomId chatroomId
+     * @param request message save request
+     * @return success
      */
     @PostMapping("/api/messages/chatrooms/{chatroomId}/save")
-    void saveMessage(@PathVariable("chatroomId") long chatroomId, 
+    boolean saveMessage(@PathVariable("chatroomId") long chatroomId,
                      @RequestBody SaveMessageRequest request);
 }

@@ -7,33 +7,30 @@ spring:
   
   cloud:
     gateway:
-      # 开启服务发现路由
       discovery:
         locator:
           enabled: true
           lower-case-service-id: true
       
       routes:
-        # 认证服务路由
         - id: auth-service
           uri: lb://auth-service
           predicates:
             - Path=/api/auth/**
         
-        # CRUD服务路由 (包含用户查询和聊天室管理)
         - id: crud-service-users
           uri: lb://crud-service
           predicates:
             - Path=/api/users/**
           filters:
-            - AuthenticationGatewayFilter  # 添加认证过滤器
+            - AuthenticationGatewayFilter
         
         - id: crud-service-chatrooms
           uri: lb://crud-service
           predicates:
             - Path=/api/chatrooms/**
           filters:
-            - AuthenticationGatewayFilter  # 添加认证过滤器
+            - AuthenticationGatewayFilter
         
         # 消息服务路由
         - id: message-service
@@ -41,7 +38,7 @@ spring:
           predicates:
             - Path=/api/messages/**
           filters:
-            - AuthenticationGatewayFilter  # 添加认证过滤器
+            - AuthenticationGatewayFilter
         
         # WebSocket网关路由
         - id: websocket-gateway
@@ -49,9 +46,8 @@ spring:
           predicates:
             - Path=/ws/**
           filters:
-            - AuthenticationGatewayFilter  # 添加认证过滤器，验证JWT并传递用户信息
+            - AuthenticationGatewayFilter
 
-      # 全局CORS配置
       globalcors:
         cors-configurations:
           '[/**]':
@@ -60,14 +56,16 @@ spring:
             allowed-headers: "*"
             allow-credentials: true
             max-age: 3600
+      
+      httpclient:
+        connect-timeout: 3000
+        response-timeout: 10s
 
-  # Redis配置（用于限流）
   data:
     redis:
       host: ${REDIS_HOST:localhost}
       port: ${REDIS_PORT:6379}
 
-# Eureka客户端配置
 eureka:
   client:
     service-url:
@@ -81,25 +79,58 @@ eureka:
     lease-renewal-interval-in-seconds: 10
     lease-expiration-duration-in-seconds: 30
 
-# 监控端点配置
+resilience4j:
+  circuitbreaker:
+    instances:
+      auth-service:
+        failureRateThreshold: 60
+        minimumNumberOfCalls: 5
+        permittedNumberOfCallsInHalfOpenState: 3
+        waitDurationInOpenState: 20s
+        slidingWindowSize: 10
+        slidingWindowType: COUNT_BASED
+  retry:
+    instances:
+      auth-service:
+        maxAttempts: 2
+        waitDuration: 500ms
+        exponentialBackoffMultiplier: 2
+        retryExceptions:
+          - org.springframework.web.reactive.function.client.WebClientResponseException.InternalServerError
+          - org.springframework.web.reactive.function.client.WebClientResponseException.ServiceUnavailable
+          - java.net.ConnectException
+          - java.util.concurrent.TimeoutException
+  timelimiter:
+    instances:
+      auth-service:
+        timeoutDuration: 3s
+
 management:
   endpoints:
     web:
       exposure:
-        include: health,info,metrics,gateway
+        include: health,info,metrics,gateway,circuitbreakers,retries
   endpoint:
     health:
       show-details: always
     gateway:
       enabled: true
+    circuitbreakers:
+      enabled: true
 
-# 日志配置
 logging:
   level:
     org.springframework.cloud.gateway: DEBUG
     org.springframework.cloud.netflix.eureka: INFO
 
-# JWT配置
 chatroomApp:
+  BLACKLIST_PREFIX: "token:blacklist:"
+  JWT_TOKEN_COOKIE_NAME: JWT-Token
   jwt:
     secret: 404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970
+  request:
+    header:
+      UserID: X-User-Id
+      UserEmail: X-User-Email
+      UserFirstName: X-User-FirstName
+      UserLastName: X-User-LastName

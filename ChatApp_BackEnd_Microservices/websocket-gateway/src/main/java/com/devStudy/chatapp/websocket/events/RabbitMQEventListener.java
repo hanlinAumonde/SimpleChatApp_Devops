@@ -25,7 +25,7 @@ public class RabbitMQEventListener {
     }
 
     /**
-     * 监听聊天室成员变更事件
+     * Listener for chatroom member change events
      */
     @RabbitListener(queues = RabbitMQConfig.WEBSOCKET_CHATROOM_MEMBER_CHANGE_QUEUE)
     public void handleChatroomMemberChange(Map<String, Object> eventData) {
@@ -49,7 +49,7 @@ public class RabbitMQEventListener {
             List<UserDTO> addedMembers = convertToUserDTOs(addedMembersData);
             List<UserDTO> removedMembers = convertToUserDTOs(removedMembersData);
 
-            // 通过WebSocket处理器广播成员变更消息
+            // Broadcast member change message via WebSocket handler
             webSocketHandler.broadcastMemberChangeMessage(chatroomId, addedMembers, removedMembers);
             
             LOGGER.debug("Successfully processed member change event for chatroom {}: +{} -{}", 
@@ -61,7 +61,7 @@ public class RabbitMQEventListener {
     }
 
     /**
-     * 监听聊天室删除事件
+     * Listener for chatroom removal events
      */
     @RabbitListener(queues = RabbitMQConfig.WEBSOCKET_CHATROOM_REMOVE_QUEUE)
     public void handleChatroomRemoval(Map<String, Object> eventData) {
@@ -74,7 +74,7 @@ public class RabbitMQEventListener {
                 return;
             }
 
-            // 通过WebSocket处理器广播聊天室删除消息
+            // Broadcast chatroom removal message via WebSocket handler
             webSocketHandler.broadcastChatroomRemovalMessage(chatroomId);
             
             LOGGER.info("Successfully processed chatroom removal event for chatroom {}", chatroomId);
@@ -85,7 +85,7 @@ public class RabbitMQEventListener {
     }
 
     /**
-     * 将Map数据转换为UserDTO列表
+     * Transform a list of Map data to a list of UserDTOs
      */
     private List<UserDTO> convertToUserDTOs(List<Map<String, Object>> usersData) {
         if (usersData == null) {
@@ -98,7 +98,7 @@ public class RabbitMQEventListener {
     }
 
     /**
-     * 将Map数据转换为UserDTO
+     * Transform a Map to a UserDTO
      */
     private UserDTO mapToUserDTO(Map<String, Object> userData) {
         UserDTO user = new UserDTO();
@@ -112,7 +112,7 @@ public class RabbitMQEventListener {
     }
 
     /**
-     * 安全地从Map中获取Long值
+     * Obtain Long value from Map safely
      */
     private Long getLong(Map<String, Object> map, String key) {
         Object value = map.get(key);
@@ -129,7 +129,7 @@ public class RabbitMQEventListener {
     }
 
     /**
-     * 安全地从Map中获取Boolean值
+     * Obtain Boolean value from Map safely
      */
     private Boolean getBoolean(Map<String, Object> map, String key) {
         Object value = map.get(key);
@@ -138,6 +138,6 @@ public class RabbitMQEventListener {
         } else if (value instanceof String) {
             return Boolean.valueOf((String) value);
         }
-        return false; // 默认值
+        return false;
     }
 }

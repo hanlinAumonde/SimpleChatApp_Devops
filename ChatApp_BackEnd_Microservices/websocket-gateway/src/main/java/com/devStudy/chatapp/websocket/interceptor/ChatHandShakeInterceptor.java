@@ -27,7 +27,7 @@ public class ChatHandShakeInterceptor implements HandshakeInterceptor {
                                    WebSocketHandler wsHandler,
                                    Map<String, Object> attributes) {
         try {
-            // 1. 解析WebSocket URL参数
+            // 1. Analyze the WebSocket URL to extract path variables
             UriTemplate uriTemplate = new UriTemplate(CHAT_ENDPOINT);
             Map<String, String> uriTemplateVars = uriTemplate.match(request.getURI().toString());
             
@@ -39,7 +39,7 @@ public class ChatHandShakeInterceptor implements HandshakeInterceptor {
             String chatroomIdStr = uriTemplateVars.get("chatroomId");
             String userIdFromUrl = cleanUserId(uriTemplateVars.get("userId"));
 
-            // 2. 从API网关传递的HTTP头获取用户信息
+            // 2. Obtain user information from HTTP headers set by the gateway
             String userId = request.getHeaders().getFirst("X-User-Id");
             String userEmail = request.getHeaders().getFirst("X-User-Email");
             String userFirstName = request.getHeaders().getFirst("X-User-FirstName");
@@ -50,13 +50,13 @@ public class ChatHandShakeInterceptor implements HandshakeInterceptor {
                 return false;
             }
 
-            // 3. 验证URL中的userId与网关传递的userId一致
+            // 3. Verify that the user ID from the header matches the one in the URL
             if (!userId.equals(userIdFromUrl)) {
                 LOGGER.warn("User ID mismatch - URL: {}, Header: {}", userIdFromUrl, userId);
                 return false;
             }
 
-            // 4. 构建用户信息对象
+            // 4. Build UserDTO object
             UserDTO userInfo = new UserDTO();
             userInfo.setId(Long.parseLong(userId));
             userInfo.setMail(userEmail);
@@ -65,7 +65,7 @@ public class ChatHandShakeInterceptor implements HandshakeInterceptor {
             userInfo.setAdmin(false);
             userInfo.setActive(true);
 
-            // 5. 存储信息到WebSocket会话属性
+            // 5. Save attributes for use in WebSocket session
             attributes.put("chatroomId", Long.parseLong(chatroomIdStr));
             attributes.put("userId", Long.parseLong(userId));
             attributes.put("userInfo", userInfo);
@@ -90,7 +90,7 @@ public class ChatHandShakeInterceptor implements HandshakeInterceptor {
     }
 
     /**
-     * 清理用户ID中的查询参数
+     * Clean the userId by removing any query parameters.
      */
     private String cleanUserId(String userId) {
         if (userId != null && userId.contains("?")) {

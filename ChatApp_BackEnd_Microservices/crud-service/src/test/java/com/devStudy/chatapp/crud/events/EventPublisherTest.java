@@ -1,6 +1,5 @@
 package com.devStudy.chatapp.crud.events;
 
-import com.devStudy.chatapp.crud.config.RabbitMQConfig;
 import com.devStudy.chatapp.crud.dto.UserDTO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -10,6 +9,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -35,6 +35,10 @@ class EventPublisherTest {
     private List<UserDTO> addedMembers;
     private List<UserDTO> removedMembers;
 
+    private static final String EXCHANGE_NAME = "chatroom-event-exchange";
+    private static final String CHATROOM_MEMBER_CHANGE_ROUTING_KEY = "chatroom.member.change";
+    private static final String CHATROOM_REMOVE_ROUTING_KEY = "chatroom.remove";
+
     @BeforeEach
     void setUp() {
         addedUser = new UserDTO();
@@ -51,6 +55,10 @@ class EventPublisherTest {
 
         addedMembers = Collections.singletonList(addedUser);
         removedMembers = Collections.singletonList(removedUser);
+
+        ReflectionTestUtils.setField(eventPublisher, "EXCHANGE_NAME", EXCHANGE_NAME);
+        ReflectionTestUtils.setField(eventPublisher, "CHATROOM_MEMBER_CHANGE_ROUTING_KEY", CHATROOM_MEMBER_CHANGE_ROUTING_KEY);
+        ReflectionTestUtils.setField(eventPublisher, "CHATROOM_REMOVE_ROUTING_KEY", CHATROOM_REMOVE_ROUTING_KEY);
     }
 
     @Test
@@ -64,8 +72,8 @@ class EventPublisherTest {
         // 验证RabbitTemplate被调用
         ArgumentCaptor<Map<String, Object>> messageCaptor = ArgumentCaptor.forClass(Map.class);
         verify(rabbitTemplate).convertAndSend(
-                eq(RabbitMQConfig.EXCHANGE_NAME),
-                eq(RabbitMQConfig.CHATROOM_MEMBER_CHANGE_ROUTING_KEY),
+                eq(EXCHANGE_NAME),
+                eq(CHATROOM_MEMBER_CHANGE_ROUTING_KEY),
                 messageCaptor.capture()
         );
 
@@ -89,8 +97,8 @@ class EventPublisherTest {
         // 验证RabbitTemplate被调用
         ArgumentCaptor<Map<String, Object>> messageCaptor = ArgumentCaptor.forClass(Map.class);
         verify(rabbitTemplate).convertAndSend(
-                eq(RabbitMQConfig.EXCHANGE_NAME),
-                eq(RabbitMQConfig.CHATROOM_MEMBER_CHANGE_ROUTING_KEY),
+                eq(EXCHANGE_NAME),
+                eq(CHATROOM_MEMBER_CHANGE_ROUTING_KEY),
                 messageCaptor.capture()
         );
 
@@ -113,8 +121,8 @@ class EventPublisherTest {
 
         ArgumentCaptor<Map<String, Object>> messageCaptor = ArgumentCaptor.forClass(Map.class);
         verify(rabbitTemplate).convertAndSend(
-                eq(RabbitMQConfig.EXCHANGE_NAME),
-                eq(RabbitMQConfig.CHATROOM_MEMBER_CHANGE_ROUTING_KEY),
+                eq(EXCHANGE_NAME),
+                eq(CHATROOM_MEMBER_CHANGE_ROUTING_KEY),
                 messageCaptor.capture()
         );
 
@@ -134,8 +142,8 @@ class EventPublisherTest {
 
         ArgumentCaptor<Map<String, Object>> messageCaptor = ArgumentCaptor.forClass(Map.class);
         verify(rabbitTemplate).convertAndSend(
-                eq(RabbitMQConfig.EXCHANGE_NAME),
-                eq(RabbitMQConfig.CHATROOM_MEMBER_CHANGE_ROUTING_KEY),
+                eq(EXCHANGE_NAME),
+                eq(CHATROOM_MEMBER_CHANGE_ROUTING_KEY),
                 messageCaptor.capture()
         );
 
@@ -158,8 +166,8 @@ class EventPublisherTest {
 
         // 验证RabbitTemplate被调用
         verify(rabbitTemplate).convertAndSend(
-                eq(RabbitMQConfig.EXCHANGE_NAME),
-                eq(RabbitMQConfig.CHATROOM_MEMBER_CHANGE_ROUTING_KEY),
+                eq(EXCHANGE_NAME),
+                eq(CHATROOM_MEMBER_CHANGE_ROUTING_KEY),
                 any(Map.class)
         );
     }
@@ -175,8 +183,8 @@ class EventPublisherTest {
         // 验证RabbitTemplate被调用
         ArgumentCaptor<Map<String, Object>> messageCaptor = ArgumentCaptor.forClass(Map.class);
         verify(rabbitTemplate).convertAndSend(
-                eq(RabbitMQConfig.EXCHANGE_NAME),
-                eq(RabbitMQConfig.CHATROOM_REMOVE_ROUTING_KEY),
+                eq(EXCHANGE_NAME),
+                eq(CHATROOM_REMOVE_ROUTING_KEY),
                 messageCaptor.capture()
         );
 
@@ -200,8 +208,8 @@ class EventPublisherTest {
 
         // 验证RabbitTemplate被调用
         verify(rabbitTemplate).convertAndSend(
-                eq(RabbitMQConfig.EXCHANGE_NAME),
-                eq(RabbitMQConfig.CHATROOM_REMOVE_ROUTING_KEY),
+                eq(EXCHANGE_NAME),
+                eq(CHATROOM_REMOVE_ROUTING_KEY),
                 any(Map.class)
         );
     }
@@ -231,8 +239,8 @@ class EventPublisherTest {
 
         ArgumentCaptor<Map<String, Object>> messageCaptor = ArgumentCaptor.forClass(Map.class);
         verify(rabbitTemplate).convertAndSend(
-                eq(RabbitMQConfig.EXCHANGE_NAME),
-                eq(RabbitMQConfig.CHATROOM_MEMBER_CHANGE_ROUTING_KEY),
+                eq(EXCHANGE_NAME),
+                eq(CHATROOM_MEMBER_CHANGE_ROUTING_KEY),
                 messageCaptor.capture()
         );
 
@@ -274,8 +282,8 @@ class EventPublisherTest {
 
         ArgumentCaptor<Map<String, Object>> messageCaptor = ArgumentCaptor.forClass(Map.class);
         verify(rabbitTemplate).convertAndSend(
-                eq(RabbitMQConfig.EXCHANGE_NAME),
-                eq(RabbitMQConfig.CHATROOM_MEMBER_CHANGE_ROUTING_KEY),
+                eq(EXCHANGE_NAME),
+                eq(CHATROOM_MEMBER_CHANGE_ROUTING_KEY),
                 messageCaptor.capture()
         );
 

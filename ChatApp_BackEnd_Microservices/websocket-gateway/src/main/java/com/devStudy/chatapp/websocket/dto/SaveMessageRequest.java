@@ -3,8 +3,8 @@ package com.devStudy.chatapp.websocket.dto;
 import java.util.Date;
 
 /**
- * 消息保存请求DTO
- * 与message-service中的SaveMessageRequest保持一致
+ * DTO of saving message request.
+ * Same as in message-service.
  */
 public class SaveMessageRequest {
     private long senderId;

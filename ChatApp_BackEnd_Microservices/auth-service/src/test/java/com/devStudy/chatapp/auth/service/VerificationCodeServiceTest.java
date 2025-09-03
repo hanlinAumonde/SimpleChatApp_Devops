@@ -15,8 +15,6 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.concurrent.TimeUnit;
 
-import static com.devStudy.chatapp.auth.utils.ConstantValues.ATTEMPTS_PREFIX;
-import static com.devStudy.chatapp.auth.utils.ConstantValues.CODE_PREFIX;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
@@ -37,11 +35,15 @@ class VerificationCodeServiceTest {
     private VerificationCodeService verificationCodeService;
 
     private static final String TEST_EMAIL = "test@example.com";
-    private static final int EXPIRATION_TIME = 300; // 5分钟
+    private static final int EXPIRATION_TIME = 300;
+    private static final String ATTEMPTS_PREFIX = "verification:attempts:";
+    private static final String CODE_PREFIX = "verification:code:";
 
     @BeforeEach
     void setUp() {
         ReflectionTestUtils.setField(verificationCodeService, "expirationTime", EXPIRATION_TIME);
+        ReflectionTestUtils.setField(verificationCodeService, "ATTEMPTS_PREFIX", ATTEMPTS_PREFIX);
+        ReflectionTestUtils.setField(verificationCodeService, "CODE_PREFIX", CODE_PREFIX);
     }
 
     @Test
@@ -219,12 +221,10 @@ class VerificationCodeServiceTest {
         verify(emailService).sendSimpleMessage(
                 eq(TEST_EMAIL),
                 eq("Verification Code"),
-                argThat(body -> {
-                    return body.contains("Bonjour") &&
-                           body.contains("code de vérification") &&
-                           body.contains("5 minutes") &&
-                           body.contains("Cordialement");
-                })
+                argThat(body -> body.contains("Bonjour") &&
+                       body.contains("code de vérification") &&
+                       body.contains("5 minutes") &&
+                       body.contains("Cordialement"))
         );
     }
 

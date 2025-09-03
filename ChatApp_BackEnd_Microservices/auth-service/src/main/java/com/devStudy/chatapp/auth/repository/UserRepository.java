@@ -14,17 +14,17 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     Optional<User> findByMailAndAdmin(String mail, boolean isAdmin);
 
-    // 更新用户状态
+    // Update active status
     @Modifying
     @Query("update User u set u.active = ?2 where u.mail = ?1")
     void updateActive(String userEmail, boolean status);
 
-    // 更新失败登录次数
+    // Update failed attempts
     @Modifying
     @Query("update User u set u.failedAttempts = ?2 where u.mail = ?1")
     void updateFailedAttempts(String userEmail, int failedAttempts);
 
-    // 更新密码
+    // Update password
     @Modifying
     @Query("update User u set u.pwd = ?2 where u.mail = ?1")
     void updatePwd(String userEmail, String pwd);

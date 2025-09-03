@@ -58,6 +58,9 @@ public class SecurityConfig {
     @Value("${chatroomApp.MAX_FAILED_ATTEMPTS}")
     private int maxFailedAttempts;
 
+    @Value("${chatroomApp.jwt.JWT_TOKEN_COOKIE_NAME}")
+    private String JWT_TOKEN_COOKIE_NAME;
+
     @Bean
     PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
@@ -85,7 +88,7 @@ public class SecurityConfig {
     VerificationCodeAuthenticationFilter verificationCodeAuthenticationFilter(AuthenticationManager authManager, JwtTokenService jwtTokenService) {
         VerificationCodeAuthenticationFilter filter = new VerificationCodeAuthenticationFilter(VERIFICATION_CODE_LOGIN_ENDPOINT);
         filter.setAuthenticationManager(authManager);
-        filter.setAuthenticationSuccessHandler(new LoginAuthenticationSuccessHandler(jwtTokenService));
+        filter.setAuthenticationSuccessHandler(new LoginAuthenticationSuccessHandler(jwtTokenService, JWT_TOKEN_COOKIE_NAME));
         filter.setAuthenticationFailureHandler(new LoginAuthenticationFailureHandler());
         return filter;
     }
@@ -123,7 +126,7 @@ public class SecurityConfig {
 	                    .key(rememberMeKey) 
 	                    .tokenValiditySeconds(rememberMeExpirationTime)
 	                    .userDetailsService(userDetailService)  
-	                    .authenticationSuccessHandler(new LoginAuthenticationSuccessHandler(jwtTokenService))
+	                    .authenticationSuccessHandler(new LoginAuthenticationSuccessHandler(jwtTokenService, JWT_TOKEN_COOKIE_NAME))
                 )
                 
                 .authorizeHttpRequests(auth -> 
@@ -138,7 +141,7 @@ public class SecurityConfig {
                 .formLogin(formLogin -> 
                 	formLogin
 						.loginProcessingUrl("/api/auth/login-process")
-						.successHandler(new LoginAuthenticationSuccessHandler(jwtTokenService))
+						.successHandler(new LoginAuthenticationSuccessHandler(jwtTokenService, JWT_TOKEN_COOKIE_NAME))
 						.failureHandler(new LoginAuthenticationFailureHandler())
                 )
 

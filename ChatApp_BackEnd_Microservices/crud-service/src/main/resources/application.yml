@@ -34,8 +34,11 @@ eureka:
     prefer-ip-address: true
     hostname: ${HOSTNAME:crud-service}
 
-# 应用配置
 chatroomApp:
+  rabbitmq:
+    RABBITMQ_EXCHANGE_NAME: chatroom-event-exchange
+    CHATROOM_MEMBER_CHANGE_ROUTING_KEY: chatroom.member.change
+    CHATROOM_REMOVE_ROUTING_KEY: chatroom.remove
   pageable:
     DefaultPageSize_Chatrooms: 5
     DefaultPageSize_Users: 5

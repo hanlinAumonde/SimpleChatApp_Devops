@@ -27,11 +27,9 @@ public class User {
     @Column(name = "is_active")
     private boolean active = true;
 
-    // 用户创建的聊天室
     @OneToMany(mappedBy = "creator", fetch = FetchType.LAZY)
     private Set<Chatroom> createdRooms = new HashSet<>();
 
-    // 用户加入的聊天室
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
         name = "user_chatroom_relationship",

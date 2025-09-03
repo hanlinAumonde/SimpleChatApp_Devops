@@ -4,6 +4,7 @@ import com.devStudy.chatapp.gateway.service.Interface.IRedisBlackListService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.ReactiveRedisTemplate;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
@@ -15,8 +16,8 @@ import java.time.Instant;
 public class RedisBlackListService implements IRedisBlackListService {
     private static final Logger LOGGER = LoggerFactory.getLogger(RedisBlackListService.class);
     
-    // 与认证服务保持一致的前缀
-    private static final String BLACKLIST_PREFIX = "token:blacklist:";
+    @Value("${chatroomApp.BLACKLIST_PREFIX}")
+    private String BLACKLIST_PREFIX;
 
     private final ReactiveRedisTemplate<String, String> reactiveRedisTemplate;
 

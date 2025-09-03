@@ -19,7 +19,7 @@ public class RedisConfig {
         RedisTemplate<String, Object> template = new RedisTemplate<>();
         template.setConnectionFactory(connectionFactory);
         
-        // 配置ObjectMapper
+        // Config ObjectMapper
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.activateDefaultTyping(
             LaissezFaireSubTypeValidator.instance,
@@ -27,16 +27,16 @@ public class RedisConfig {
             JsonTypeInfo.As.PROPERTY
         );
         
-        // 使用Jackson序列化器
+        // Use GenericJackson2JsonRedisSerializer to serialize and deserialize the value of redis (default is JDK serialization)
         GenericJackson2JsonRedisSerializer jackson2JsonRedisSerializer = 
             new GenericJackson2JsonRedisSerializer(objectMapper);
         StringRedisSerializer stringRedisSerializer = new StringRedisSerializer();
         
-        // key采用String的序列化方式
+        // Use StringRedisSerializer to serialize and deserialize the key of redis
         template.setKeySerializer(stringRedisSerializer);
         template.setHashKeySerializer(stringRedisSerializer);
         
-        // value采用jackson的序列化方式
+        // Use GenericJackson2JsonRedisSerializer to serialize and deserialize the value of redis
         template.setValueSerializer(jackson2JsonRedisSerializer);
         template.setHashValueSerializer(jackson2JsonRedisSerializer);
         
@@ -45,7 +45,7 @@ public class RedisConfig {
     }
 
     /**
-     * 配置Redis消息监听容器，用于pub/sub功能
+     * Configure RedisMessageListenerContainer for subscribing to Redis channels
      */
     @Bean
     public RedisMessageListenerContainer redisMessageListenerContainer(RedisConnectionFactory connectionFactory) {

@@ -24,11 +24,11 @@ public class MessageController {
     }
 
     /**
-     * 获取聊天室的消息历史（分页）
-     * @param chatroomId 聊天室ID
-     * @param page 页码，默认为0
-     * @param userIdHeader 来自网关的用户ID
-     * @return 消息列表
+     * Obtiene mensajes históricos por ID de sala de chat y página
+     * @param chatroomId chatroom ID
+     * @param page page number (0-based)
+     * @param userIdHeader user ID from header (optional)
+     * @return list of chat messages
      */
     @GetMapping("/chatrooms/{chatroomId}/history")
     public ResponseEntity<List<ChatMsgDTO>> getHistoryMsgByChatroomIdAndPage(
@@ -41,7 +41,7 @@ public class MessageController {
             try {
                 currentUserId = Long.parseLong(userIdHeader);
             } catch (NumberFormatException e) {
-                // 如果解析失败，忽略用户ID
+                // If parsing fails, we simply treat it as null
             }
         }
         
@@ -56,13 +56,13 @@ public class MessageController {
     }
 
     /**
-     * 保存消息（通常由WebSocket网关调用）
-     * @param chatroomId 聊天室ID
-     * @param request 消息保存请求
-     * @return 成功响应
+     * Sava un mensaje en una sala de chat específica
+     * @param chatroomId chatroom ID
+     * @param request request body containing message details
+     * @return response entity with success status
      */
     @PostMapping("/chatrooms/{chatroomId}/save")
-    public ResponseEntity<Void> saveMessage(
+    public ResponseEntity<Boolean> saveMessage(
             @PathVariable long chatroomId,
             @RequestBody SaveMessageRequest request) {
         
@@ -72,13 +72,13 @@ public class MessageController {
         sender.setLastName(request.getSenderLastName());
         sender.setMail(request.getSenderMail());
         
-        chatMessageService.saveMsgIntoCollection(
+        boolean result = chatMessageService.saveMsgIntoCollection(
             chatroomId, 
             sender, 
             request.getContent(), 
             request.getTimestamp() != null ? request.getTimestamp() : new Date()
         );
         
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(result);
     }
 }

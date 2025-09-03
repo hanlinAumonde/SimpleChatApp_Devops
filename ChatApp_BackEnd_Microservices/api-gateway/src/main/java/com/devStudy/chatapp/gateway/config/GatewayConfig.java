@@ -28,8 +28,8 @@ public class GatewayConfig {
                 .<String, String>newSerializationContext()
                 .key(stringRedisSerializer)
                 .value(stringRedisSerializer)
-                .hashKey(stringRedisSerializer)  // 添加hashKey序列化器
-                .hashValue(stringRedisSerializer)  // 添加hashValue序列化器
+                .hashKey(stringRedisSerializer)
+                .hashValue(stringRedisSerializer)
                 .build();
 
         return new ReactiveRedisTemplate<>(connectionFactory, serializationContext);

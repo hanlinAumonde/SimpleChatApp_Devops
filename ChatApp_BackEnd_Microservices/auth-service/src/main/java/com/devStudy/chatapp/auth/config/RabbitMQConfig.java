@@ -1,31 +1,40 @@
 package com.devStudy.chatapp.auth.config;
 
-import static com.devStudy.chatapp.auth.utils.ConstantValues.RABBITMQ_QUEUE_Q1;
-import static com.devStudy.chatapp.auth.utils.ConstantValues.RABBITMQ_QUEUE_Q2;
-import static com.devStudy.chatapp.auth.utils.ConstantValues.RABBITMQ_EXCHANGE_NAME;
-import static com.devStudy.chatapp.auth.utils.ConstantValues.ROUTING_KEY_RET_PASSWORD;
-import static com.devStudy.chatapp.auth.utils.ConstantValues.ROUTING_KEY_VERIFICATION_CODE;
-
 import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.BindingBuilder;
 import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.core.TopicExchange;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class RabbitMQConfig {
+
+    @Value("${chatroomApp.rabbitmq.RABBITMQ_EXCHANGE_NAME}")
+    private String RABBITMQ_EXCHANGE_NAME;
+
+    @Value("${chatroomApp.rabbitmq.RABBITMQ_QUEUE_Q1}")
+    private String RABBITMQ_QUEUE_Q1;
+
+    @Value("${chatroomApp.rabbitmq.RABBITMQ_QUEUE_Q2}")
+    private String RABBITMQ_QUEUE_Q2;
+
+    @Value("${chatroomApp.rabbitmq.ROUTING_KEY_RET_PASSWORD}")
+    private String ROUTING_KEY_RET_PASSWORD;
+
+    @Value("${chatroomApp.rabbitmq.ROUTING_KEY_VERIFICATION_CODE}")
+    private String ROUTING_KEY_VERIFICATION_CODE;
+
     @Bean 
-    Queue queue() { 
-        return new Queue(RABBITMQ_QUEUE_Q1); 
-    }
+    Queue queue() { return new Queue(RABBITMQ_QUEUE_Q1); }
 
     @Bean 
     Queue queue2() { 
         return new Queue(RABBITMQ_QUEUE_Q2); 
     }
 
-    @Bean(name = RABBITMQ_EXCHANGE_NAME)
+    @Bean
     TopicExchange exchange() { 
         return new TopicExchange(RABBITMQ_EXCHANGE_NAME); 
     }
