@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <!-- 引入Spring Boot默认配置 -->
+    <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+    <include resource="org/springframework/boot/logging/logback/console-appender.xml"/>
+    
+    <!-- 应用名称 -->
+    <springProperty scope="context" name="appName" source="spring.application.name"/>
+    
+    <!-- 日志级别配置 -->
+    <springProfile name="!prod">
+        <logger name="com.devStudy.chatapp" level="DEBUG"/>
+        <logger name="org.springframework.security" level="DEBUG"/>
+        <logger name="org.springframework.web" level="DEBUG"/>
+        <root level="INFO"/>
+    </springProfile>
+    
+    <springProfile name="prod">
+        <logger name="com.devStudy.chatapp" level="INFO"/>
+        <logger name="org.springframework.security" level="WARN"/>
+        <logger name="org.springframework.web" level="INFO"/>
+        <root level="INFO"/>
+    </springProfile>
+    
+    <!-- 控制台日志 - 彩色输出 -->
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <springProfile name="!prod">
+                <pattern>%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr(%5p) %clr(${PID:- }){magenta} %clr([%t]){faint} %clr([${appName:-},%X{traceId:-},%X{spanId:-}]){yellow} %clr(%logger{36}){cyan} %clr(:){faint} %m%n%wEx</pattern>
+            </springProfile>
+            <springProfile name="prod">
+                <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %5p ${PID:- } [%t] [${appName:-},%X{traceId:-},%X{spanId:-}] %logger{36} : %m%n</pattern>
+            </springProfile>
+        </encoder>
+    </appender>
+    
+    <!-- 文件日志 - JSON格式用于日志收集 -->
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>logs/${appName}.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>logs/${appName}.%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern>
+            <maxFileSize>100MB</maxFileSize>
+            <maxHistory>30</maxHistory>
+            <totalSizeCap>3GB</totalSizeCap>
+        </rollingPolicy>
+        <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+            <providers>
+                <timestamp/>
+                <logLevel/>
+                <loggerName/>
+                <mdc/>
+                <pattern>
+                    <pattern>
+                        {
+                        "service": "${appName:-}",
+                        "pid": "${PID:-}",
+                        "thread": "%t",
+                        "traceId": "%X{traceId:-}",
+                        "spanId": "%X{spanId:-}",
+                        "message": "%m"
+                        }
+                    </pattern>
+                </pattern>
+                <stackTrace/>
+            </providers>
+        </encoder>
+    </appender>
+    
+    <!-- Error文件单独记录 -->
+    <appender name="ERROR_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>logs/${appName}-error.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>logs/${appName}-error.%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern>
+            <maxFileSize>100MB</maxFileSize>
+            <maxHistory>30</maxHistory>
+            <totalSizeCap>1GB</totalSizeCap>
+        </rollingPolicy>
+        <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+            <providers>
+                <timestamp/>
+                <logLevel/>
+                <loggerName/>
+                <mdc/>
+                <pattern>
+                    <pattern>
+                        {
+                        "service": "${appName:-}",
+                        "pid": "${PID:-}",
+                        "thread": "%t",
+                        "traceId": "%X{traceId:-}",
+                        "spanId": "%X{spanId:-}",
+                        "message": "%m"
+                        }
+                    </pattern>
+                </pattern>
+                <stackTrace/>
+            </providers>
+        </encoder>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>ERROR</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+    </appender>
+    
+    <!-- Root logger配置 -->
+    <root level="INFO">
+        <appender-ref ref="CONSOLE"/>
+        <springProfile name="!test">
+            <appender-ref ref="FILE"/>
+            <appender-ref ref="ERROR_FILE"/>
+        </springProfile>
+    </root>
+</configuration>

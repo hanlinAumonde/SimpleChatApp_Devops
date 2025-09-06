@@ -115,6 +115,7 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf
                         .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
                         .csrfTokenRequestHandler(new SpaCsrfTokenRequestHandler())
+                        .ignoringRequestMatchers("/actuator/**")
                 )
 
                 .sessionManagement(session ->
@@ -132,7 +133,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> 
                 	auth
                         .requestMatchers("/api/auth/**").permitAll()
-                        .requestMatchers("/actuator/health").permitAll()
+                        .requestMatchers("/actuator/**").permitAll()
                         .anyRequest().authenticated()
                 )
 

@@ -1,0 +1,108 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+# 规则文件
+rule_files:
+  # - "first_rules.yml"
+  # - "second_rules.yml"
+
+# 告警管理器配置
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+          # - alertmanager:9093
+
+# 抓取配置
+scrape_configs:
+  # Prometheus自身监控
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  # 微服务应用监控
+  - job_name: 'eureka-server'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: ['eureka-server:8761']
+    scrape_interval: 15s
+    scrape_timeout: 10s
+    
+  - job_name: 'auth-service'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: ['auth-service:8081']
+    scrape_interval: 15s
+    scrape_timeout: 10s
+
+  - job_name: 'api-gateway'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: ['api-gateway:8080']
+    scrape_interval: 15s
+    scrape_timeout: 10s
+
+  - job_name: 'crud-service'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: ['crud-service:8083']
+    scrape_interval: 15s
+    scrape_timeout: 10s
+
+  - job_name: 'message-service'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: ['message-service:8084']
+    scrape_interval: 15s
+    scrape_timeout: 10s
+
+  - job_name: 'websocket-gateway'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: ['websocket-gateway:8086']
+    scrape_interval: 15s
+    scrape_timeout: 10s
+
+  # 基础设施监控
+  - job_name: 'postgres'
+    static_configs:
+      - targets: ['postgres:5432']
+    scrape_interval: 30s
+    scrape_timeout: 10s
+    # 需要postgres_exporter
+
+  - job_name: 'mongodb'
+    static_configs:
+      - targets: ['mongodb:27017']
+    scrape_interval: 30s
+    scrape_timeout: 10s
+    # 需要mongodb_exporter
+
+  - job_name: 'redis'
+    static_configs:
+      - targets: ['redis:6379']
+    scrape_interval: 30s
+    scrape_timeout: 10s
+    # 需要redis_exporter
+
+  - job_name: 'rabbitmq'
+    static_configs:
+      - targets: ['rabbitmq:15672']
+    scrape_interval: 30s
+    scrape_timeout: 10s
+    # 需要rabbitmq_prometheus插件
+
+  # Docker容器监控
+  - job_name: 'cadvisor'
+    static_configs:
+      - targets: ['cadvisor:8080']
+    scrape_interval: 15s
+    scrape_timeout: 10s
+
+  # 节点监控
+  - job_name: 'node-exporter'
+    static_configs:
+      - targets: ['node-exporter:9100']
+    scrape_interval: 15s
+    scrape_timeout: 10s

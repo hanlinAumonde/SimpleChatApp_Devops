@@ -4,7 +4,8 @@ server:
 spring:
   application:
     name: auth-service
-    
+
+
   datasource:
     url: jdbc:postgresql://${DB_HOST:localhost}:5432/chatAppDB
     username: ${DB_USERNAME:postgres}
@@ -49,6 +50,8 @@ spring:
           auth: true
           starttls:
             enable: true
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:dev}
 
 eureka:
   client:
@@ -79,10 +82,41 @@ chatroomApp:
     RABBITMQ_QUEUE_Q2: sendMail-queue-q2
     ROUTING_KEY_RET_PASSWORD: mail.resetPassword
     ROUTING_KEY_VERIFICATION_CODE: mail.verificationCode
-  VERIFICATION_CODE_LOGIN_ENDPOINT: /api/auth/login-verification-code
+  VERIFICATION_CODE_LOGIN_ENDPOINT: /api/auth/login-verification-code-process
   MAX_FAILED_ATTEMPTS: 3
 
-logging:
-  level:
-    com.devStudy.chatapp.auth: DEBUG
-    org.springframework.security: DEBUG
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus,loggers,env
+      base-path: /actuator
+  endpoint:
+    health:
+      show-details: when_authorized
+    metrics:
+      enabled: true
+    prometheus:
+      enabled: true
+  metrics:
+    distribution:
+      percentiles-histogram:
+        http.server.requests: true
+      percentiles:
+        http.server.requests: 0.50,0.95,0.99
+    tags:
+      application: ${spring.application.name}
+  tracing:
+    sampling:
+      probability: ${TRACING_PROBABILITY:1.0} # 100% for development; adjust for production
+    baggage:
+      correlation:
+        enabled: true
+      remote-fields: user-id,session-id
+  zipkin:
+    tracing:
+      endpoint: ${ZIPKIN_URL:http://localhost:9411/api/v2/spans}
+  prometheus:
+    metrics:
+      export:
+        enabled: true

@@ -1,4 +1,6 @@
 mongodb-data/
 postgres-data/
 redis-data/
+rabbitmq-data/
+logs/
 .idea

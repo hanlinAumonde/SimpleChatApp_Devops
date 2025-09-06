@@ -1,7 +1,10 @@
 spring:
   application:
     name: websocket-gateway
-    
+
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:dev}
+
   data:
     redis:
       host: ${REDIS_HOST:localhost}
@@ -50,7 +53,6 @@ server:
 websocket:
   chat:
     endpoint: /ws/chatroom/{chatroomId}/user/{userId}
-    allowed-origins: ${FRONT_URL:http://localhost:4200}
     session-expiry: 86400  # 24 hours in seconds
     redis:
       chatroom-channel: channel:chatroom:%d
@@ -71,17 +73,6 @@ eureka:
     hostname: ${HOSTNAME:websocket-gateway}
     lease-renewal-interval-in-seconds: 30
     lease-expiration-duration-in-seconds: 90
-
-logging:
-  level:
-    com.devStudy.chatapp.websocket: INFO
-    org.springframework.web.socket: INFO
-    org.springframework.cloud.openfeign: DEBUG
-    redis: INFO
-    rabbitmq: INFO
-  pattern:
-    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
-    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
 
 resilience4j:
   circuitbreaker:
@@ -113,12 +104,41 @@ management:
   endpoints:
     web:
       exposure:
-        include: health,info,metrics,circuitbreakers,retries
+        include: health,info,metrics,prometheus,circuitbreakers,retries,loggers,env
+      base-path: /actuator
   endpoint:
     health:
-      show-details: when-authorized
+      show-details: when_authorized
+    metrics:
+      enabled: true
+    prometheus:
+      enabled: true
     circuitbreakers:
       enabled: true
+  metrics:
+    distribution:
+      percentiles-histogram:
+        http.server.requests: true
+        websocket.connections: true
+      percentiles:
+        http.server.requests: 0.50,0.95,0.99
+        websocket.connections: 0.50,0.95,0.99
+    tags:
+      application: ${spring.application.name}
+  tracing:
+    sampling:
+      probability: ${TRACING_PROBABILITY:1.0}
+    baggage:
+      correlation:
+        enabled: true
+      remote-fields: user-id,session-id,chatroom-id
+  zipkin:
+    tracing:
+      endpoint: ${ZIPKIN_URL:http://localhost:9411/api/v2/spans}
+  prometheus:
+    metrics:
+      export:
+        enabled: true
   info:
     env:
       enabled: true
