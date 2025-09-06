@@ -114,4 +114,4 @@ services:
     networks:
       - chatapp-network
       - middleware-network
-    restart:always
+    restart: always

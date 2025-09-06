@@ -80,21 +80,4 @@ export class ChatroomService {
       {withCredentials: true}
     );
   }
-
-  getHistoryMessages(chatroomId: number): Observable<HistoryMessage[]>{
-    return this.httpClient.get<HistoryMessage[]>(
-      this.ChatroomApi + '/' + chatroomId + properties.ChatroomApi.HistoryMessages,
-      {withCredentials: true}
-    )
-  }
-
-  getHistoryMessagesByPage(chatroomId: number, page: number): Observable<HistoryMessage[]>{
-    return this.httpClient.get<HistoryMessage[]>(
-      this.ChatroomApi + '/' + chatroomId + properties.ChatroomApi.HistoryMessages,
-      {
-        params: { page: page.toString() },
-        withCredentials: true
-      }
-    );
-  }
 }

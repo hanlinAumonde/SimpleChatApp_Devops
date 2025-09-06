@@ -1,0 +1,122 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: auth-service
+
+
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:localhost}:5432/chatAppDB
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:123456}
+    driver-class-name: org.postgresql.Driver
+    
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: false
+        
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: 6379
+      timeout: 2000ms
+      lettuce:
+        pool:
+          max-active: 8
+          max-wait: -1ms
+          max-idle: 8
+          min-idle: 0
+          
+  rabbitmq:
+    host: ${RABBITMQ_HOST:localhost}
+    port: 5672
+    username: ${RABBITMQ_USERNAME:admin}
+    password: ${RABBITMQ_PASSWORD:admin}
+    
+  mail:
+    host: smtp.your-email-provider.com
+    port: 587
+    username: your-email-address@mail.com
+    password: your-generated-password
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:dev}
+
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_SERVER_URL:http://localhost:8761/eureka}
+  instance:
+    prefer-ip-address: true
+    hostname: ${HOSTNAME:auth-service}
+
+chatroomApp:
+  FrontEndURL: ${FRONT_URL:http://localhost:4200}
+  jwt:
+    secret: 404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970
+    loginTokenExpirationTime: 1440  # 24 hours
+    resetPwdTokenExpirationTime: 10  # 10 minutes
+    JWT_TOKEN_COOKIE_NAME: JWT-Token
+  rememberMe:
+    key: myRememberMeKey
+    expirationTime: 86400  # 24 hours
+  redis:
+    expirationTime: 300
+    BLACKLIST_PREFIX: "token:blacklist:"
+    ATTEMPTS_PREFIX: "verification:attempts:"
+    CODE_PREFIX: "verification:code:"
+  rabbitmq:
+    RABBITMQ_EXCHANGE_NAME: topics-exchange
+    RABBITMQ_QUEUE_Q1: sendMail-queue-q1
+    RABBITMQ_QUEUE_Q2: sendMail-queue-q2
+    ROUTING_KEY_RET_PASSWORD: mail.resetPassword
+    ROUTING_KEY_VERIFICATION_CODE: mail.verificationCode
+  VERIFICATION_CODE_LOGIN_ENDPOINT: /api/auth/login-verification-code-process
+  MAX_FAILED_ATTEMPTS: 3
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus,loggers,env
+      base-path: /actuator
+  endpoint:
+    health:
+      show-details: when_authorized
+    metrics:
+      enabled: true
+    prometheus:
+      enabled: true
+  metrics:
+    distribution:
+      percentiles-histogram:
+        http.server.requests: true
+      percentiles:
+        http.server.requests: 0.50,0.95,0.99
+    tags:
+      application: ${spring.application.name}
+  tracing:
+    sampling:
+      probability: ${TRACING_PROBABILITY:1.0} # 100% for development; adjust for production
+    baggage:
+      correlation:
+        enabled: true
+      remote-fields: user-id,session-id
+  zipkin:
+    tracing:
+      endpoint: ${ZIPKIN_URL:http://localhost:9411/api/v2/spans}
+  prometheus:
+    metrics:
+      export:
+        enabled: true

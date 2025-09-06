@@ -1,0 +1,163 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: api-gateway
+
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:dev}
+  
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true
+      
+      routes:
+        - id: auth-service
+          uri: lb://auth-service
+          predicates:
+            - Path=/api/auth/**
+        
+        - id: crud-service-users
+          uri: lb://crud-service
+          predicates:
+            - Path=/api/users/**
+          filters:
+            - AuthenticationGatewayFilter
+        
+        - id: crud-service-chatrooms
+          uri: lb://crud-service
+          predicates:
+            - Path=/api/chatrooms/**
+          filters:
+            - AuthenticationGatewayFilter
+        
+        # 消息服务路由
+        - id: message-service
+          uri: lb://message-service
+          predicates:
+            - Path=/api/messages/**
+          filters:
+            - AuthenticationGatewayFilter
+        
+        # WebSocket网关路由
+        - id: websocket-gateway
+          uri: lb:ws://websocket-gateway
+          predicates:
+            - Path=/ws/**
+          filters:
+            - AuthenticationGatewayFilter
+
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowed-origin-patterns: "*"
+            allowed-methods: "*"
+            allowed-headers: "*"
+            allow-credentials: true
+            max-age: 3600
+      
+      httpclient:
+        connect-timeout: 3000
+        response-timeout: 10s
+
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_SERVER_URL:http://localhost:8761/eureka}
+    registry-fetch-interval-seconds: 30
+    fetch-registry: true
+    register-with-eureka: true
+  instance:
+    prefer-ip-address: true
+    hostname: ${HOSTNAME:api-gateway}
+    lease-renewal-interval-in-seconds: 10
+    lease-expiration-duration-in-seconds: 30
+
+resilience4j:
+  circuitbreaker:
+    instances:
+      auth-service:
+        failureRateThreshold: 60
+        minimumNumberOfCalls: 5
+        permittedNumberOfCallsInHalfOpenState: 3
+        waitDurationInOpenState: 20s
+        slidingWindowSize: 10
+        slidingWindowType: COUNT_BASED
+  retry:
+    instances:
+      auth-service:
+        maxAttempts: 2
+        waitDuration: 500ms
+        exponentialBackoffMultiplier: 2
+        retryExceptions:
+          - org.springframework.web.reactive.function.client.WebClientResponseException.InternalServerError
+          - org.springframework.web.reactive.function.client.WebClientResponseException.ServiceUnavailable
+          - java.net.ConnectException
+          - java.util.concurrent.TimeoutException
+  timelimiter:
+    instances:
+      auth-service:
+        timeoutDuration: 3s
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus,gateway,circuitbreakers,retries,loggers,env
+      base-path: /actuator
+  endpoint:
+    health:
+      show-details: when_authorized
+    metrics:
+      enabled: true
+    prometheus:
+      enabled: true
+    gateway:
+      enabled: true
+    circuitbreakers:
+      enabled: true
+  metrics:
+    distribution:
+      percentiles-histogram:
+        http.server.requests: true
+        gateway.requests: true
+      percentiles:
+        http.server.requests: 0.50,0.95,0.99
+        gateway.requests: 0.50,0.95,0.99
+    tags:
+      application: ${spring.application.name}
+  tracing:
+    sampling:
+      probability: ${TRACING_PROBABILITY:1.0}
+    baggage:
+      correlation:
+        enabled: true
+      remote-fields: user-id,session-id
+  zipkin:
+    tracing:
+      endpoint: ${ZIPKIN_URL:http://localhost:9411/api/v2/spans}
+  prometheus:
+    metrics:
+      export:
+        enabled: true
+
+chatroomApp:
+  BLACKLIST_PREFIX: "token:blacklist:"
+  JWT_TOKEN_COOKIE_NAME: JWT-Token
+  jwt:
+    secret: 404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970
+  request:
+    header:
+      UserID: X-User-Id
+      UserEmail: X-User-Email
+      UserFirstName: X-User-FirstName
+      UserLastName: X-User-LastName

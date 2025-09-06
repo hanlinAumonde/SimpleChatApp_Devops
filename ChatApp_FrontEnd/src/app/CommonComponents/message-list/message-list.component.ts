@@ -1,10 +1,10 @@
 import { Component, Input, OnInit, ViewChild, ElementRef, AfterViewChecked, WritableSignal, signal, OnChanges, SimpleChanges } from '@angular/core';
 import { ChatMessage, HistoryMessage, HistoryMessageType, InitialMessageType } from '../../Models/ChatMessage';
-import { ChatroomService } from '../../Services/ChatroomService/chatroom.service';
 import { BehaviorSubject, map, withLatestFrom } from 'rxjs';
 import { AsyncPipe } from '@angular/common';
 import { UserInChatroomModel } from '../../Models/UserModel';
 import { ScrollBehavior } from '../../Models/ChatroomModel';
+import {HistoryMessageService} from '../../Services/HistoryMessageService/history-message.service';
 
 @Component({
   selector: 'MessageList',
@@ -24,16 +24,16 @@ export class MessageListComponent implements OnInit, AfterViewChecked, OnChanges
   haveMoreHistMsgs : WritableSignal<boolean> = signal(true);
 
   scrollBehavior!: ScrollBehavior;
-    
-  constructor(private chatroomService: ChatroomService) {}
+
+  constructor(private messageService: HistoryMessageService) {}
 
   ngOnInit(): void {
     this.scrollBehavior = ScrollBehavior.None;
-    this.chatroomService.getHistoryMessagesByPage(parseInt(this.chatroomId!), this.histMsgPage()).subscribe(
+    this.messageService.getHistoryMessagesByPage(parseInt(this.chatroomId!), this.histMsgPage()).subscribe(
       (historyMessages: HistoryMessage[]) => {
         if(historyMessages.length === 0) this.haveMoreHistMsgs.update(_ => false);
         this.historyMessages$.next(historyMessages);
-        
+
         setTimeout(() => this.scrollToBottom('auto'), 100);
       }
     );
@@ -48,11 +48,11 @@ export class MessageListComponent implements OnInit, AfterViewChecked, OnChanges
   showMoreHistMsg(event: Event): void {
     event.preventDefault();
     this.scrollBehavior = ScrollBehavior.Preserve;
-    
+
     const currentFirstMessage = this.historyMessages$.value[0];
-    
+
     this.histMsgPage.update(page => page + 1);
-    this.chatroomService.getHistoryMessagesByPage(parseInt(this.chatroomId!), this.histMsgPage()).pipe(
+    this.messageService.getHistoryMessagesByPage(parseInt(this.chatroomId!), this.histMsgPage()).pipe(
       withLatestFrom(this.historyMessages$),
       map(([newHistMsg, oldHistMsg]) => {
         if(newHistMsg.length === 0) {
@@ -64,7 +64,7 @@ export class MessageListComponent implements OnInit, AfterViewChecked, OnChanges
             (msg, idx) => ({
               ...msg,
               index: idx + newHistMsg.length,
-              messageType: msg.messageType === HistoryMessageType.DATE_SIGN && msg.timestamp === latestNewMsg.timestamp? 
+              messageType: msg.messageType === HistoryMessageType.DATE_SIGN && msg.timestamp === latestNewMsg.timestamp?
                                 HistoryMessageType.LATEST_DATE_SIGN : msg.messageType
             }
           ))) as HistoryMessage[];
@@ -115,7 +115,7 @@ export class MessageListComponent implements OnInit, AfterViewChecked, OnChanges
   cssClassForAlert(messageType: InitialMessageType): string {
     return 'alert ' + (messageType === 1? 'alert-info': 'alert-dark');
   }
-  
+
   spanStyle = {
     'min-width': '8px',
   }

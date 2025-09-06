@@ -10,16 +10,16 @@
   },
 
   "LoginApi": {
-    "BaseUrl" : "/api/login",
+    "BaseUrl" : "/api/auth",
     "LoginProcess" : "/login-process",
     "Logout" : "/logout",
     "LoggedUser" : "/check-login",
     "DemandVerificationCode" : "/verification-code",
-    "LoginWithVerificationCode" : "/verification-code-process",
+    "LoginWithVerificationCode" : "/login-verification-code-process",
     "SendResetPwdEmail": "/forget-password",
     "ValidateToken": "/validate-token",
     "ResetPassword": "/reset-password",
-    "CreateCompte": "/compte/create"
+    "CreateCompte": "/register"
   },
 
   "ChatroomApi": {
@@ -27,7 +27,11 @@
     "CreateChatroom": "/create",
     "Members": "/members",
     "UsersInvited": "/users/invited",
-    "UsersNotInvited": "/users/not-invited",
+    "UsersNotInvited": "/users/not-invited"
+  },
+
+  "MessageApi": {
+    "BaseUrl": "/api/messages",
     "HistoryMessages": "/history"
   }
 }
