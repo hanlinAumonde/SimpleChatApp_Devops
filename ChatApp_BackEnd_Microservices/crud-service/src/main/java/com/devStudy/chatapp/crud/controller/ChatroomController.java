@@ -132,29 +132,4 @@ public class ChatroomController {
 		}
 		return ResponseEntity.status(500).body(new ArrayList<>());
 	}
-	
-	// User-related endpoints integrated into this controller
-	@GetMapping("/users/{userId}/owned")
-	public ResponseEntity<Page<ChatroomDTO>> getChatroomsOwnedByUser(
-			@PathVariable long userId, 
-			@RequestParam(defaultValue = "0")int page, 
-			@RequestHeader("X-User-Id") String userIdHeader){
-		long currentUserId = userService.getUserIdFromHeaders(userIdHeader);
-        if(userId == currentUserId){
-        	return ResponseEntity.ok(chatroomService.getChatroomsOwnedOfUserByPage(userId,page));
-        }
-        return ResponseEntity.status(403).body(Page.empty());
-    }
-    
-    @GetMapping("/users/{userId}/joined")
-    public ResponseEntity<Page<ChatroomWithOwnerAndStatusDTO>> getChatroomsJoinedByUser(
-    		@PathVariable long userId, 
-    		@RequestParam(defaultValue = "0")int page, 
-    		@RequestHeader("X-User-Id") String userIdHeader){
-    	long currentUserId = userService.getUserIdFromHeaders(userIdHeader);
-        if(userId == currentUserId){
-        	return ResponseEntity.ok(chatroomService.getChatroomsJoinedOfUserByPage(userId, false, page));
-        }
-        return ResponseEntity.status(403).body(Page.empty());
-    }
 }

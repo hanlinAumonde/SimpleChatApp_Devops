@@ -13,9 +13,6 @@ import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry
 @EnableWebSocket
 public class WebSocketConfig implements WebSocketConfigurer {
 
-    @Value("${websocket.chat.allowed-origins}")
-    private String allowedOrigins;
-
     @Value("${websocket.chat.endpoint}")
     private String CHAT_ENDPOINT;
 
@@ -34,6 +31,6 @@ public class WebSocketConfig implements WebSocketConfigurer {
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
         registry.addHandler(distributedChatWebSocketHandler, CHAT_ENDPOINT)
                 .addInterceptors(chatHandShakeInterceptor)
-                .setAllowedOrigins(allowedOrigins.split(","));
+                .setAllowedOrigins("*");
     }
 }
